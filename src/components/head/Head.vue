@@ -1,11 +1,16 @@
 <template>
-  <div class="app-main">
-    <router-view></router-view>
+  <div class="header">
+    {{msg}}
   </div>
 </template>
 
 <script>
   export default {
+    data() {
+      return {
+        msg: 'header',
+      };
+    },
   };
 </script>
 
