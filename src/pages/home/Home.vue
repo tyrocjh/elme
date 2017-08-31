@@ -1,6 +1,8 @@
 <template>
   <div>
-    <home-header></home-header>
+    <home-header signin-up="home">
+      <span slot="logo" class="head_logo" @click="reload">ele.me</span>
+    </home-header>
     <div class="home-page">
       {{msg}}
     </div>
@@ -16,6 +18,11 @@
       return {
         msg: 'Home',
       };
+    },
+    methods: {
+      reload() {
+        window.location.reload();
+      },
     },
   };
 </script>

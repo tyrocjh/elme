@@ -11,7 +11,7 @@
 </script>
 
 <style rel="stylesheet/scss" lang="scss" scoped>
-  @import './style/reset.scss';
+  @import 'style/reset.css';
 
   #app {
     position: relative;
