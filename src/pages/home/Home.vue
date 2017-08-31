@@ -1,7 +1,7 @@
 <template>
   <div>
     <home-header signin-up="home">
-      <span slot="logo" class="head_logo" @click="reload">ele.me</span>
+      <span slot="logo" class="logo" @click="reload">ele.me</span>
     </home-header>
     <div class="home-page">
       {{msg}}
@@ -28,4 +28,12 @@
 </script>
 
 <style rel="stylesheet/scss" lang="scss" scoped>
+  .logo {
+    color: #fff;
+    margin-left: .1rem;
+  }
+  .home-page {
+    padding-top: .45rem;
+    min-height: 700px;
+  }
 </style>
