@@ -1,7 +1,7 @@
-(function (doc, win) {
+(function rem(doc, win) {
   const docEl = doc.documentElement;
   const resizeEvt = 'orientationchange' in window ? 'orientationchange' : 'resize';
-  const recalc = function () {
+  const recalc = function cal() {
     const clientWidth = docEl.clientWidth;
     if (!clientWidth) return;
     docEl.style.fontSize = `${100 * (clientWidth / 320)}px`;

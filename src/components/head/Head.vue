@@ -27,6 +27,7 @@
     width: 100%;
 
     .login {
+      font-size: .14rem;
       position: absolute;
       right: .15rem;
 
