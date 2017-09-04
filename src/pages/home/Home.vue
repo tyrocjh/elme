@@ -10,13 +10,15 @@
       </p>
       <router-link :to="/city/" class="choose">
         <span>广州</span>
-        <i class="fa  fa-angle-right" aria-hidden="true" @click="toggleScreenfull"></i>
+        <i class="fa  fa-angle-right" aria-hidden="true"></i>
       </router-link>
     </nav>
     <section class="popular-city">
       <h4>热门城市</h4>
       <ul class="clearfix">
-        <li>广州</li><li>广州</li><li>广州</li><li>广州</li><li>广州</li><li>广州</li><li>广州</li><li>广州</li>
+        <router-link tag="li" v-for="item in popularCities" :to="'/city'" :key="item.id">
+          {{item.name}}
+        </router-link>
       </ul>
     </section>
     <section class="group-city-section">
@@ -39,14 +41,35 @@
 </template>
 
 <script>
+  import { mapState, mapActions } from 'vuex';
   import HomeHeader from '@/components/head/Head';
 
   export default {
     components: { HomeHeader },
+    computed: {
+      ...mapState({
+        popularCities: ({ city }) => city.popularCities,
+        isFetching: ({ city }) => city.isFetching,
+      }),
+    },
     methods: {
+      ...mapActions([
+        'getCities',
+      ]),
+      initData() {
+        this.getPopularCities();
+      },
+      getPopularCities() {
+        this.getCities({
+          type: 'hot',
+        });
+      },
       reload() {
         window.location.reload();
       },
+    },
+    created() {
+      this.initData();
     },
   };
 </script>
