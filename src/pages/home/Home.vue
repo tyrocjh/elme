@@ -8,7 +8,7 @@
         <span>当前定位城市：</span>
         <span>定位不准时，请在城市列表中选择</span>
       </p>
-      <router-link :to="/city/" class="choose">
+      <router-link :to="'/city/' + currentCity.id" class="choose">
         <span>{{currentCity.name}}</span>
         <i class="fa  fa-angle-right" aria-hidden="true"></i>
       </router-link>
@@ -16,7 +16,7 @@
     <section class="popular-city">
       <h4>热门城市</h4>
       <ul class="clearfix">
-        <router-link tag="li" v-for="item in popularCities" :to="'/city'" :key="item.id">
+        <router-link tag="li" v-for="item in popularCities" :to="'/city/' + item.id" :key="item.id">
           {{item.name}}
         </router-link>
       </ul>
@@ -29,7 +29,7 @@
             <span v-if="index === 0">（按字母排序）</span>
           </h4>
           <ul class="clearfix">
-            <router-link tag="li" v-for="item in items" :to="'/city'" :key="item.id" class="ellipsis">
+            <router-link tag="li" v-for="item in items" :to="'/city/' + item.id" :key="item.id" class="ellipsis">
               {{item.name}}
             </router-link>
           </ul>
