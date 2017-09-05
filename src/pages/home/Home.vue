@@ -9,7 +9,7 @@
         <span>定位不准时，请在城市列表中选择</span>
       </p>
       <router-link :to="/city/" class="choose">
-        <span>广州</span>
+        <span>{{currentCity.name}}</span>
         <i class="fa  fa-angle-right" aria-hidden="true"></i>
       </router-link>
     </nav>
@@ -23,16 +23,15 @@
     </section>
     <section class="group-city-section">
       <ul>
-        <li class="group-city">
-          <h4>A</h4>
+        <li v-for="(items, key, index) in sortGroupCity" :key="key" class="group-city">
+          <h4>
+            {{key}}
+            <span v-if="index === 0">（按字母排序）</span>
+          </h4>
           <ul class="clearfix">
-            <li>肇庆</li><li>肇庆</li><li>肇庆</li><li>肇庆</li><li>肇庆</li><li>肇庆</li><li>肇庆</li><li>肇庆</li><li>肇庆</li><li>肇庆</li><li>肇庆</li>
-          </ul>
-        </li>
-        <li class="group-city">
-          <h4>B</h4>
-          <ul class="clearfix">
-            <li>肇庆</li><li>肇庆</li><li>肇庆</li><li>肇庆</li><li>肇庆</li><li>肇庆</li><li>肇庆</li><li>肇庆</li><li>肇庆</li><li>肇庆</li><li>肇庆</li>
+            <router-link tag="li" v-for="item in items" :to="'/city'" :key="item.id" class="ellipsis">
+              {{item.name}}
+            </router-link>
           </ul>
         </li>
       </ul>
@@ -41,27 +40,43 @@
 </template>
 
 <script>
-  import { mapState, mapActions } from 'vuex';
+  import { mapState, mapGetters, mapActions } from 'vuex';
   import HomeHeader from '@/components/head/Head';
 
   export default {
     components: { HomeHeader },
     computed: {
       ...mapState({
+        currentCity: ({ city }) => city.currentCity,
         popularCities: ({ city }) => city.popularCities,
         isFetching: ({ city }) => city.isFetching,
       }),
+      ...mapGetters([
+        'sortGroupCity',
+      ]),
     },
     methods: {
       ...mapActions([
         'getCities',
       ]),
       initData() {
+        this.getCurrentCity();
         this.getPopularCities();
+        this.getGroupCities();
+      },
+      getCurrentCity() {
+        this.getCities({
+          type: 'guess',
+        });
       },
       getPopularCities() {
         this.getCities({
           type: 'hot',
+        });
+      },
+      getGroupCities() {
+        this.getCities({
+          type: 'group',
         });
       },
       reload() {
@@ -130,13 +145,18 @@
       height: .32rem;
       line-height: .32rem;
       text-indent: .1rem;
+
+      span {
+        font-size: .1rem;
+        color: #999;
+      }
     }
 
     ul {
       border-top: .01rem solid #e4e4e4;
       li {
         font-size: .12rem;
-        color: #3190e8;
+        color: #666;
         float: left;
         width: 25%;
         height: .34rem;
