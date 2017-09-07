@@ -1,10 +1,11 @@
-import { CITIES, CITY_REQUEST, CITY_REQUEST_FAILED } from '@/store/types';
-import { getCities } from '@/api/city';
+import { CURRENT_CITY, CITIES, SEARCH_CITIES, CITY_REQUEST, CITY_REQUEST_FAILED } from '@/store/types';
+import { getCityById, getCities, searchCities } from '@/api/city';
 
 const state = {
   currentCity: {},
   popularCities: [],
   groupCities: [],
+  resultCities: [],
   isFetching: false,
 };
 
@@ -20,6 +21,20 @@ const getters = {
 };
 
 const actions = {
+  getCityById({ commit }, id) {
+    return new Promise((resolve, reject) => {
+      commit(CITY_REQUEST);
+      getCityById(id).then((res) => {
+        commit(CURRENT_CITY, {
+          data: res.data,
+        });
+        resolve(res);
+      }).catch((err) => {
+        commit(CITY_REQUEST_FAILED);
+        reject(err);
+      });
+    });
+  },
   getCities({ commit }, payload) {
     return new Promise((resolve, reject) => {
       commit(CITY_REQUEST);
@@ -35,9 +50,27 @@ const actions = {
       });
     });
   },
+  searchCities({ commit }, payload) {
+    return new Promise((resolve, reject) => {
+      commit(CITY_REQUEST);
+      searchCities(payload).then((res) => {
+        commit(SEARCH_CITIES, {
+          data: res.data,
+        });
+        resolve(res);
+      }).catch((err) => {
+        commit(CITY_REQUEST_FAILED);
+        reject(err);
+      });
+    });
+  },
 };
 
 const mutations = {
+  [CURRENT_CITY](mState, payload) {
+    mState.isFetching = false;
+    mState.currentCity = payload.data;
+  },
   [CITIES](mState, payload) {
     mState.isFetching = false;
     switch (payload.type) {
@@ -52,6 +85,10 @@ const mutations = {
         break;
       default:
     }
+  },
+  [SEARCH_CITIES](mState, payload) {
+    mState.isFetching = false;
+    mState.resultCities = payload.data;
   },
   [CITY_REQUEST](mState) {
     mState.isFetching = true;

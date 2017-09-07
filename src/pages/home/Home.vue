@@ -1,8 +1,8 @@
 <template>
   <div>
-    <home-header signin-up="home">
+    <header-top signin-up="home">
       <span slot="logo" class="logo" @click="reload">ele.me</span>
-    </home-header>
+    </header-top>
     <nav class="city-nav">
       <p class="msg">
         <span>当前定位城市：</span>
@@ -41,10 +41,10 @@
 
 <script>
   import { mapState, mapGetters, mapActions } from 'vuex';
-  import HomeHeader from '@/components/head/Head';
+  import headerTop from '@/components/head/Head';
 
   export default {
-    components: { HomeHeader },
+    components: { headerTop },
     computed: {
       ...mapState({
         currentCity: ({ city }) => city.currentCity,
@@ -59,11 +59,6 @@
       ...mapActions([
         'getCities',
       ]),
-      initData() {
-        this.getCurrentCity();
-        this.getPopularCities();
-        this.getGroupCities();
-      },
       getCurrentCity() {
         this.getCities({
           type: 'guess',
@@ -82,6 +77,11 @@
       reload() {
         window.location.reload();
       },
+      initData() {
+        this.getCurrentCity();
+        this.getPopularCities();
+        this.getGroupCities();
+      },
     },
     created() {
       this.initData();
@@ -98,7 +98,7 @@
   .city-nav {
     background-color: #fff;
     padding-top: .45rem;
-    margin-bottom: 0.1rem;
+    margin-bottom: .01rem;
     border-bottom: .02rem solid #e4e4e4;
 
     .msg {

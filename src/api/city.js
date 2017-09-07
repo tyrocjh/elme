@@ -1,5 +1,12 @@
 import fetch from '@/utils/fetch';
 
+export function getCityById(id) {
+  return fetch({
+    url: `/v1/cities/${id}`,
+    method: 'get',
+  });
+}
+
 export function getCities(params) {
   return fetch({
     url: '/v1/cities',
@@ -8,6 +15,10 @@ export function getCities(params) {
   });
 }
 
-export function test() {
-  return '';
+export function searchCities(params) {
+  return fetch({
+    url: '/v1/pois',
+    method: 'get',
+    params,
+  });
 }
