@@ -1,4 +1,9 @@
-export const setStore = (name, content) => {
+export const getLocalStore = (name) => {
+  if (!name) return;
+  return window.localStorage.getItem(name);
+};
+
+export const setLocalStore = (name, content) => {
   if (!name) return;
   if (typeof content !== 'string') {
     content = JSON.stringify(content);
@@ -6,7 +11,7 @@ export const setStore = (name, content) => {
   window.localStorage.setItem(name, content);
 };
 
-export const getStore = (name) => {
+export const removeLocalStore = (name) => {
   if (!name) return;
-  return window.localStorage.getItem(name);
+  window.localStorage.removeItem(name);
 };

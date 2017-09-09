@@ -1,7 +1,7 @@
 <template>
   <header>
     <slot name="logo"></slot>
-    <section class="go-back" v-if="goBack">
+    <section class="go-back" v-if="goBack" @click="$router.go(-1)">
       <i class="fa fa-angle-left" aria-hidden="true"></i>
     </section>
     <section class="head-title" v-if="headTitle">
@@ -44,8 +44,11 @@
 
     .head-title {
       position: absolute;
-      width: 100%;
+      width: 50%;
       top: 0;
+      left: 0;
+      right: 0;
+      margin: 0 auto;
       text-align: center;
       span {
         font-weight: 700;

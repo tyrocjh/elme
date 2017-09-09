@@ -9,24 +9,27 @@
     </form>
     <header class="search-header" v-if="searchHistory">搜索历史</header>
     <ul class="result-list">
-      <li v-for="(item, index) in resultCities" @click="selectCity(item)" :key="index">
+      <li v-for="(item, index) in placeList" @click="selectCity(item)" :key="index">
         <h4>{{item.name}}</h4>
         <p>{{item.address}}</p>
       </li>
     </ul>
-    <footer class="search-footer" v-if="searchHistory && resultCities.length">清空所有</footer>
+    <footer class="search-footer" v-if="searchHistory && placeList.length" @click="clearHistory">清空所有</footer>
     <div class="search-none" v-if="searchNone">很抱歉！无搜索结果。</div>
   </div>
 </template>
 
 <script>
   import { mapState, mapActions } from 'vuex';
+  import { getLocalStore, setLocalStore, removeLocalStore } from '@/utils/storage';
   import headerTop from '@/components/head/Head';
 
   export default {
     components: { headerTop },
     data() {
       return {
+        placeList: [],
+        placeHistory: [],
         searchValue: '',
         searchHistory: true,
         searchNone: false,
@@ -50,16 +53,54 @@
             city_id: this.currentCity.id,
             keyword: this.searchValue,
           }).then(() => {
+            this.placeList = this.resultCities;
             this.searchHistory = false;
             this.searchNone = !this.resultCities.length;
           });
         }
       },
+      clearHistory() {
+        removeLocalStore('placeHistory');
+        this.getPlaceHistory();
+      },
+      setPlaceHistory(city) {
+        const history = getLocalStore('placeHistory');
+        if (history) {
+          let repeat = false;
+          this.placeHistory = JSON.parse(history);
+          this.placeHistory.forEach((item) => {
+            if (item.geohash === city.geohash) {
+              repeat = true;
+            }
+          });
+          if (!repeat) {
+            this.placeHistory.push(city);
+          }
+        } else {
+          this.placeHistory.push(city);
+        }
+        setLocalStore('placeHistory', this.placeHistory);
+      },
+      goToMSite(geohash) {
+        this.$router.push({ path: '/msite', query: { geohash } });
+      },
+      selectCity(city) {
+        this.setPlaceHistory(city);
+        this.goToMSite(city.geohash);
+      },
       getCurrentCity() {
         this.getCityById(this.$route.params.id);
       },
+      getPlaceHistory() {
+        if (getLocalStore('placeHistory')) {
+          this.placeList = JSON.parse(getLocalStore('placeHistory'));
+        } else {
+          this.placeList = [];
+        }
+      },
       initData() {
         this.getCurrentCity();
+        this.getPlaceHistory();
       },
     },
     created() {
@@ -136,5 +177,14 @@
     font-size: .14rem;
     color: #666;
     text-align: center;
+    background-color: #fff;
+    height: .4rem;
+    line-height: .4rem;
+  }
+
+  .search-none {
+    background-color: #fff;
+    height: .4rem;
+    line-height: .4rem;
   }
 </style>
