@@ -1,12 +1,14 @@
 <template>
   <header>
     <slot name="logo"></slot>
+    <slot name="search"></slot>
     <section class="go-back" v-if="goBack" @click="$router.go(-1)">
       <i class="fa fa-angle-left" aria-hidden="true"></i>
     </section>
     <section class="head-title" v-if="headTitle">
       <span>{{headTitle}}</span>
     </section>
+    <slot name="msite-title"></slot>
     <router-link to="login" v-if="signinUp" class="login">
       <span>登录|注册</span>
     </router-link>

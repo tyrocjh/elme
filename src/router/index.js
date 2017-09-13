@@ -21,7 +21,6 @@ export default new Router({
     }, {
       path: '/msite',
       component: Msite,
-      meta: { keepAlive: true },
     },
   ],
 });

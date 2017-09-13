@@ -22,3 +22,10 @@ export function searchCities(params) {
     params,
   });
 }
+
+export function msiteAdress(geohash) {
+  return fetch({
+    url: `/v2/pois/${geohash}`,
+    method: 'get',
+  });
+}
