@@ -7,6 +7,13 @@ export function getCityById(id) {
   });
 }
 
+export function getCityByGeo(geohash) {
+  return fetch({
+    url: `/v2/pois/${geohash}`,
+    method: 'get',
+  });
+}
+
 export function getCities(params) {
   return fetch({
     url: '/v1/cities',
@@ -20,12 +27,5 @@ export function searchCities(params) {
     url: '/v1/pois',
     method: 'get',
     params,
-  });
-}
-
-export function msiteAdress(geohash) {
-  return fetch({
-    url: `/v2/pois/${geohash}`,
-    method: 'get',
   });
 }

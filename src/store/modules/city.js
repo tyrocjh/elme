@@ -1,5 +1,5 @@
 import { CURRENT_CITY, CITIES, SEARCH_CITIES, CITY_REQUEST, CITY_REQUEST_FAILED } from '@/store/types';
-import { getCityById, getCities, searchCities, msiteAdress } from '@/api/city';
+import { getCityById, getCities, searchCities, getCityByGeo } from '@/api/city';
 
 const state = {
   currentCity: {},
@@ -35,6 +35,20 @@ const actions = {
       });
     });
   },
+  getCityByGeo({ commit }, geohash) {
+    return new Promise((resolve, reject) => {
+      commit(CITY_REQUEST);
+      getCityByGeo(geohash).then((res) => {
+        commit(CURRENT_CITY, {
+          data: res.data,
+        });
+        resolve(res);
+      }).catch((err) => {
+        commit(CITY_REQUEST_FAILED);
+        reject(err);
+      });
+    });
+  },
   getCities({ commit }, payload) {
     return new Promise((resolve, reject) => {
       commit(CITY_REQUEST);
@@ -57,21 +71,6 @@ const actions = {
         commit(SEARCH_CITIES, {
           data: res.data,
         });
-        resolve(res);
-      }).catch((err) => {
-        commit(CITY_REQUEST_FAILED);
-        reject(err);
-      });
-    });
-  },
-  msiteAdress({ commit }, geohash) {
-    return new Promise((resolve, reject) => {
-      commit(CITY_REQUEST);
-      msiteAdress(geohash).then((res) => {
-        console.info(res);
-        // commit(SEARCH_CITIES, {
-        //   data: res.data,
-        // });
         resolve(res);
       }).catch((err) => {
         commit(CITY_REQUEST_FAILED);

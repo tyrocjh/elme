@@ -5,24 +5,37 @@
         <i class="fa fa-search" aria-hidden="true"></i>
       </router-link>
       <router-link to="/home" slot="msite-title" class="msite-title">
-        <span>{{msiteTitle}}</span>
+        <span class="ellipsis">{{currentCity.address}}</span>
       </router-link>
     </header-top>
-    <div class="msite-nav">msite</div>
+    <nav class="msite-nav">
+      <div class="swiper-container">
+        <div class="swiper-wrapper">
+          <div class="swiper-slide">Slide 1</div>
+          <div class="swiper-slide">Slide 2</div>
+          <div class="swiper-slide">Slide 3</div>
+          <div class="swiper-slide">Slide 4</div>
+          <div class="swiper-slide">Slide 5</div>
+          <div class="swiper-slide">Slide 6</div>
+          <div class="swiper-slide">Slide 7</div>
+          <div class="swiper-slide">Slide 8</div>
+          <div class="swiper-slide">Slide 9</div>
+          <div class="swiper-slide">Slide 10</div>
+        </div>
+        <div class="swiper-pagination"></div>
+      </div>
+    </nav>
   </div>
 </template>
 
 <script>
   import { mapState, mapActions } from 'vuex';
+  import Swiper from 'swiper';
   import headerTop from '@/components/head/Head';
+  import 'swiper/dist/css/swiper.min.css';
 
   export default {
     components: { headerTop },
-    data() {
-      return {
-        msiteTitle: 'title',
-      };
-    },
     computed: {
       ...mapState({
         currentCity: ({ city }) => city.currentCity,
@@ -30,8 +43,8 @@
     },
     methods: {
       ...mapActions([
+        'getCityByGeo',
         'getCities',
-        'msiteAdress',
       ]),
       getCurrentCity() {
         this.getCities({
@@ -39,15 +52,23 @@
         });
       },
     },
+    mounted() {
+      new Swiper('.swiper-container', {
+        pagination: '.swiper-pagination',
+        slidesPerView: 3,
+        slidesPerColumn: 2,
+//        spaceBetween: 30,
+      });
+    },
     created() {
       const geohash = this.$route.query.geohash;
-      this.msiteAdress(geohash);
-//      if (geohash) {
-//        if (this.currentCity.geohash !== geohash) {
-//        }
-//      } else {
-//        this.getCurrentCity();
-//      }
+      if (geohash) {
+        if (this.currentCity.geohash !== geohash) {
+          this.getCityByGeo(geohash);
+        }
+      } else {
+        this.getCurrentCity();
+      }
     },
   };
 </script>
@@ -66,12 +87,13 @@
     position: absolute;
     width: 50%;
     top: 0;
-    left: 0;
+    left: -20px;
     right: 0;
     margin: 0 auto;
     text-align: center;
     span {
       color: #fff;
+      display: block;
     }
   }
 
