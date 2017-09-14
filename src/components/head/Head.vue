@@ -59,10 +59,10 @@
     }
 
     .login {
-      font-size: .14rem;
       position: absolute;
       right: .15rem;
       span {
+        font-size: .12rem;
         color: #fff;
       }
     }

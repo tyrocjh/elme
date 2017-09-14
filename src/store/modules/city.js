@@ -1,7 +1,8 @@
-import { CURRENT_CITY, CITIES, SEARCH_CITIES, CITY_REQUEST, CITY_REQUEST_FAILED } from '@/store/types';
-import { getCityById, getCities, searchCities, getCityByGeo } from '@/api/city';
+import { CURRENT_ADDRESS, CURRENT_CITY, CITIES, SEARCH_CITIES, CITY_REQUEST, CITY_REQUEST_FAILED } from '@/store/types';
+import { getAddressByGeo, getCityById, getCities, searchCities } from '@/api/city';
 
 const state = {
+  currentAddress: {},
   currentCity: {},
   popularCities: [],
   groupCities: [],
@@ -21,11 +22,11 @@ const getters = {
 };
 
 const actions = {
-  getCityById({ commit }, id) {
+  getAddressByGeo({ commit }, geohash) {
     return new Promise((resolve, reject) => {
       commit(CITY_REQUEST);
-      getCityById(id).then((res) => {
-        commit(CURRENT_CITY, {
+      getAddressByGeo(geohash).then((res) => {
+        commit(CURRENT_ADDRESS, {
           data: res.data,
         });
         resolve(res);
@@ -35,10 +36,10 @@ const actions = {
       });
     });
   },
-  getCityByGeo({ commit }, geohash) {
+  getCityById({ commit }, id) {
     return new Promise((resolve, reject) => {
       commit(CITY_REQUEST);
-      getCityByGeo(geohash).then((res) => {
+      getCityById(id).then((res) => {
         commit(CURRENT_CITY, {
           data: res.data,
         });
@@ -81,6 +82,10 @@ const actions = {
 };
 
 const mutations = {
+  [CURRENT_ADDRESS](mState, payload) {
+    mState.isFetching = false;
+    mState.currentAddress = payload.data;
+  },
   [CURRENT_CITY](mState, payload) {
     mState.isFetching = false;
     mState.currentCity = payload.data;

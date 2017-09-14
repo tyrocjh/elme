@@ -1,15 +1,15 @@
 import fetch from '@/utils/fetch';
 
-export function getCityById(id) {
+export function getAddressByGeo(geohash) {
   return fetch({
-    url: `/v1/cities/${id}`,
+    url: `/v2/pois/${geohash}`,
     method: 'get',
   });
 }
 
-export function getCityByGeo(geohash) {
+export function getCityById(id) {
   return fetch({
-    url: `/v2/pois/${geohash}`,
+    url: `/v1/cities/${id}`,
     method: 'get',
   });
 }
