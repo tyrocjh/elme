@@ -21,6 +21,13 @@
         <div class="swiper-pagination" slot="pagination"></div>
       </swiper>
     </nav>
+    <div class="merchant">
+      <header>
+        <i class="fa fa-home" aria-hidden="true"></i>
+        附近商家
+      </header>
+      <shop-list v-if="currentAddress.geohash"></shop-list>
+    </div>
   </div>
 </template>
 
@@ -28,10 +35,11 @@
   import { mapState, mapActions } from 'vuex';
   import { swiper, swiperSlide } from 'vue-awesome-swiper';
   import headerTop from '@/components/head/Head';
+  import shopList from '@/components/common/ShopList';
   import 'swiper/dist/css/swiper.css';
 
   export default {
-    components: { headerTop, swiper, swiperSlide },
+    components: { headerTop, shopList, swiper, swiperSlide },
     data() {
       return {
         imgBaseUrl: 'https://fuss10.elemecdn.com',
