@@ -99,11 +99,36 @@
 </template>
 
 <script>
+  import { mapState, mapActions } from 'vuex';
+
   export default {
+    props: ['geohash', 'restaurantCategoryId'],
     data() {
       return {
         value1: 4.6,
       };
+    },
+    computed: {
+      ...mapState({
+        shopList: ({ shop }) => shop.shopList,
+        offset: ({ shop }) => shop.offset,
+      }),
+    },
+    methods: {
+      ...mapActions([
+        'getShopList',
+      ]),
+      initData() {
+        this.getShopList({
+          latitude: this.geohash.split(',')[0],
+          longitude: this.geohash.split(',')[1],
+          restaurantCategoryId: this.restaurantCategoryId,
+          offset: this.offset,
+        });
+      },
+    },
+    created() {
+      this.initData();
     },
   };
 </script>

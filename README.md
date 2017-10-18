@@ -29,6 +29,7 @@ For detailed explanation on how things work, checkout the [guide](http://vuejs-t
 如果要覆盖组件中引入的插件的样式，则要在style面把scoped属性去掉，因为scoped属性会将style里面的样式加上唯一标识符，导致无法修改插件的样式
 
 # todos
+加loading，加墓碑效果
 要不要加入layout.vue
 header放在layout里面？还是每个页面都引用header,再通过slot传递不同的内容
 登录/注册功能为一体

@@ -1,32 +1,32 @@
 <template>
   <div>
-    <!--<header-top signin-up="home">-->
-      <!--<router-link :to="'/search/' + currentAddress.geohash" slot="search" class="search">-->
-        <!--<i class="fa fa-search" aria-hidden="true"></i>-->
-      <!--</router-link>-->
-      <!--<router-link to="/home" slot="msite-title" class="msite-title">-->
-        <!--<span class="ellipsis">{{currentAddress.address}}</span>-->
-      <!--</router-link>-->
-    <!--</header-top>-->
-    <!--<nav class="msite-nav">-->
-      <!--<swiper :options="swiperOption" class="swiper">-->
-        <!--<swiper-slide v-for="(item, index) in foodTypes" :key="index" class="slide">-->
-          <!--<router-link :to="{ path: '/food', query: { geohash: currentAddress.geohash, title:item.title, restaurant_category_id: getCategoryId(item.link)} }">-->
-            <!--<figure>-->
-              <!--<img :src="imgBaseUrl + item.image_url" />-->
-              <!--<figcaption>{{item.title}}</figcaption>-->
-            <!--</figure>-->
-          <!--</router-link>-->
-        <!--</swiper-slide>-->
-        <!--<div class="swiper-pagination" slot="pagination"></div>-->
-      <!--</swiper>-->
-    <!--</nav>-->
+    <header-top signin-up="home">
+      <router-link :to="'/search/' + currentAddress.geohash" slot="search" class="search">
+        <i class="fa fa-search" aria-hidden="true"></i>
+      </router-link>
+      <router-link to="/home" slot="msite-title" class="msite-title">
+        <span class="ellipsis">{{currentAddress.address}}</span>
+      </router-link>
+    </header-top>
+    <nav class="msite-nav">
+      <swiper :options="swiperOption" class="swiper">
+        <swiper-slide v-for="(item, index) in foodTypes" :key="index" class="slide">
+          <router-link :to="{ path: '/food', query: { geohash: currentAddress.geohash, title:item.title, restaurant_category_id: getCategoryId(item.link)} }">
+            <figure>
+              <img :src="imgBaseUrl + item.image_url" />
+              <figcaption>{{item.title}}</figcaption>
+            </figure>
+          </router-link>
+        </swiper-slide>
+        <div class="swiper-pagination" slot="pagination"></div>
+      </swiper>
+    </nav>
     <div class="merchant">
       <header>
         <i class="fa fa-home" aria-hidden="true"></i>
         附近商家
       </header>
-      <shop-list v-if="currentAddress.geohash"></shop-list>
+      <shop-list v-if="currentAddress.geohash" :geohash="currentAddress.geohash"></shop-list>
     </div>
   </div>
 </template>

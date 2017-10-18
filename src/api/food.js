@@ -12,6 +12,6 @@ export function getFoodTypes(geohash) {
   });
 }
 
-export function test() {
+export function toBeRemoved() {
   return null;
 }
