@@ -1,96 +1,34 @@
 <template>
   <div class="shoplist-container">
     <ul>
-      <li class="shop-item">
+      <li v-for="(shop, index) in shopList" :key="shop.id" class="shop-item">
         <section class="shop-image">
-          <img class="shop-img" src="http://cangdu.org:8001/img/15e386ec1875697.jpeg" />
+          <img class="shop-img" :src="baseUrl + '/img/' + shop.image_path" />
         </section>
         <section class="shop-detail">
           <header>
             <section>
-              <i>品牌</i>
-              <h4>效果显示</h4>
+              <i v-if="shop.is_premium">品牌</i>
+              <h4>{{shop.name}}</h4>
             </section>
             <ul>
-              <li>保</li><li>准</li><li>票</li>
+              <li v-for="item in shop.supports" :key="item.id">{{item.icon_name}}</li>
             </ul>
           </header>
           <div class="evaluate">
             <section class="sale">
-              <el-rate v-model="value1" disabled></el-rate>
-              <i>4.4</i>
-              <span>月售612单</span>
+              <el-rate v-model="shop.rating" disabled></el-rate>
+              <i>{{shop.rating}}</i>
+              <span>月售{{shop.recent_order_num}}单</span>
             </section>
             <section class="tip">
-              <span class="tip1">蜂鸟专送</span>
-              <span class="tip2">准时达</span>
+              <span v-if="shop.delivery_mode" class="tip1">{{shop.delivery_mode.text}}</span>
+              <span class="tip2" v-if="onTime(shop.supports)">准时达</span>
             </section>
           </div>
           <footer>
-            <p>¥20起送 / 配送费约¥5</p>
-            <p class="distance">1371公里 / <span>21小时2分钟</span></p>
-          </footer>
-        </section>
-      </li>
-      <li class="shop-item">
-        <section class="shop-image">
-          <img class="shop-img" src="http://cangdu.org:8001/img/15e386ec1875697.jpeg" />
-        </section>
-        <section class="shop-detail">
-          <header>
-            <section>
-              <i>品牌</i>
-              <h4>效果显示</h4>
-            </section>
-            <ul>
-              <li>保</li><li>准</li><li>票</li>
-            </ul>
-          </header>
-          <div class="evaluate">
-            <section class="sale">
-              <el-rate v-model="value1" disabled></el-rate>
-              <i>4.4</i>
-              <span>月售612单</span>
-            </section>
-            <section class="tip">
-              <span class="tip1">蜂鸟专送</span>
-              <span class="tip2">准时达</span>
-            </section>
-          </div>
-          <footer>
-            <p>¥20起送 / 配送费约¥5</p>
-            <p class="distance">1371公里 / <span>21小时2分钟</span></p>
-          </footer>
-        </section>
-      </li>
-      <li class="shop-item">
-        <section class="shop-image">
-          <img class="shop-img" src="http://cangdu.org:8001/img/15e386ec1875697.jpeg" />
-        </section>
-        <section class="shop-detail">
-          <header>
-            <section>
-              <i>品牌</i>
-              <h4>效果显示</h4>
-            </section>
-            <ul>
-              <li>保</li><li>准</li><li>票</li>
-            </ul>
-          </header>
-          <div class="evaluate">
-            <section class="sale">
-              <el-rate v-model="value1" disabled></el-rate>
-              <i>4.4</i>
-              <span>月售612单</span>
-            </section>
-            <section class="tip">
-              <span class="tip1">蜂鸟专送</span>
-              <span class="tip2">准时达</span>
-            </section>
-          </div>
-          <footer>
-            <p>¥20起送 / 配送费约¥5</p>
-            <p class="distance">1371公里 / <span>21小时2分钟</span></p>
+            <p>¥{{shop.float_minimum_order_amount}}起送 / {{shop.piecewise_agent_fee.tips}}</p>
+            <p class="distance">{{shop.distance}} / <span>{{shop.order_lead_time}}</span></p>
           </footer>
         </section>
       </li>
@@ -100,11 +38,13 @@
 
 <script>
   import { mapState, mapActions } from 'vuex';
+  import { baseUrl } from '@/config/env';
 
   export default {
     props: ['geohash', 'restaurantCategoryId'],
     data() {
       return {
+        baseUrl,
         value1: 4.6,
       };
     },
@@ -118,6 +58,17 @@
       ...mapActions([
         'getShopList',
       ]),
+      onTime(supports) {
+        let flag = false;
+        if ((supports instanceof Array) && supports.length) {
+          supports.forEach((item) => {
+            if (item.icon_name === '准') {
+              flag = true;
+            }
+          });
+        }
+        return flag;
+      },
       initData() {
         this.getShopList({
           latitude: this.geohash.split(',')[0],

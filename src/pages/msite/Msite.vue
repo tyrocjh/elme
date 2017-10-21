@@ -124,6 +124,7 @@
   }
 
   .msite-nav {
+    border-bottom: .005rem solid #e4e4e4;
     padding-top: .45rem;
   }
 
@@ -153,6 +154,9 @@
 
   .merchant {
     background-color: #fff;
+    padding-top: .1rem;
+    margin-top: .1rem;
+    border-top: .005rem solid #e4e4e4;
     header {
       padding-left: .12rem;
       font-size: .13rem;

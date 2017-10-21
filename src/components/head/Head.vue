@@ -30,6 +30,7 @@
 <style rel="stylesheet/scss" lang="scss" scoped>
   header {
     position: fixed;
+    z-index: 100;
     background-color: #3190e8;
     height: .45rem;
     line-height: .45rem;
