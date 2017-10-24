@@ -1,6 +1,6 @@
 import fetch from '@/utils/fetch';
 
-export function getShopList(latitude, longitude, offset, restaurantCategoryId = '', restaurantCategoryIds = '', orderBy = '', deliveryMode = '', supportIds = []) {
+export function getShopList(latitude, longitude, offset, restaurantCategoryId = '', restaurantCategoryIds = '', orderBy = '', deliveryMode = '', supportIds = [], limit = 5) {
   let supportStr = '';
   supportIds.forEach((item) => {
     if (item.status) {
@@ -19,7 +19,7 @@ export function getShopList(latitude, longitude, offset, restaurantCategoryId = 
       'restaurant_category_ids[]': restaurantCategoryIds,
       orderBy,
       'delivery_mode[]': deliveryMode + supportStr,
-      limit: 10,
+      limit,
       'extras[]': 'activities',
       keyword: '',
     },

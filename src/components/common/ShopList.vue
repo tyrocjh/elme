@@ -1,6 +1,6 @@
 <template>
   <div class="shoplist-container">
-    <ul>
+    <ul v-infinite-scroll="loadMore" infinite-scroll-disabled="disableLoadMore" infinite-scroll-immediate-check=false>
       <li v-for="(shop, index) in shopList" :key="shop.id" class="shop-item">
         <section class="shop-image">
           <img class="shop-img" :src="baseUrl + '/img/' + shop.image_path" />
@@ -33,19 +33,22 @@
         </section>
       </li>
     </ul>
+    <p class="no-more-tips" v-if="disableLoadMore">没有更多了...</p>
   </div>
 </template>
 
 <script>
   import { mapState, mapActions } from 'vuex';
+  import infiniteScroll from 'vue-infinite-scroll';
   import { baseUrl } from '@/config/env';
 
   export default {
+    directives: { infiniteScroll },
     props: ['geohash', 'restaurantCategoryId'],
     data() {
       return {
         baseUrl,
-        value1: 4.6,
+        disableLoadMore: false,
       };
     },
     computed: {
@@ -57,7 +60,25 @@
     methods: {
       ...mapActions([
         'getShopList',
+        'changeOffset',
       ]),
+      getShopData() {
+        this.disableLoadMore = true;
+        this.getShopList({
+          latitude: this.geohash.split(',')[0],
+          longitude: this.geohash.split(',')[1],
+          restaurantCategoryId: this.restaurantCategoryId,
+          offset: this.offset,
+        }).then((res) => {
+          if (res.length === 5) {
+            this.disableLoadMore = false;
+          }
+        });
+      },
+      loadMore() {
+        this.changeOffset();
+        this.getShopData();
+      },
       onTime(supports) {
         let flag = false;
         if ((supports instanceof Array) && supports.length) {
@@ -70,12 +91,7 @@
         return flag;
       },
       initData() {
-        this.getShopList({
-          latitude: this.geohash.split(',')[0],
-          longitude: this.geohash.split(',')[1],
-          restaurantCategoryId: this.restaurantCategoryId,
-          offset: this.offset,
-        });
+        this.getShopData();
       },
     },
     created() {
@@ -188,6 +204,15 @@
           }
         }
       }
+    }
+
+    .no-more-tips {
+      color: #999;
+      text-align: center;
+      font-size: .14rem;
+      height: .4rem;
+      line-height: .4rem;
+      margin-bottom: .4rem;
     }
   }
 </style>
