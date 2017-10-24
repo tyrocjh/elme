@@ -35,4 +35,3 @@ header放在layout里面？还是每个页面都引用header,再通过slot传递
 登录/注册功能为一体
 路由const home = r => require.ensure([], () => r(require('../page/home/home')), 'home')
 使用keep-alive缓存组件
-user-o  list-ul search-plus cutlery

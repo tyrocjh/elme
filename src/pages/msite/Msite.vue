@@ -28,6 +28,7 @@
       </header>
       <shop-list v-if="currentAddress.geohash" :geohash="currentAddress.geohash"></shop-list>
     </div>
+    <footer-bottom :geohash="currentAddress.geohash"></footer-bottom>
   </div>
 </template>
 
@@ -35,11 +36,12 @@
   import { mapState, mapActions } from 'vuex';
   import { swiper, swiperSlide } from 'vue-awesome-swiper';
   import headerTop from '@/components/head/Head';
+  import footerBottom from '@/components/foot/Foot';
   import shopList from '@/components/common/ShopList';
   import 'swiper/dist/css/swiper.css';
 
   export default {
-    components: { headerTop, shopList, swiper, swiperSlide },
+    components: { headerTop, footerBottom, shopList, swiper, swiperSlide },
     data() {
       return {
         imgBaseUrl: 'https://fuss10.elemecdn.com',
