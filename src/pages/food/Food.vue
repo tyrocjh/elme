@@ -8,7 +8,27 @@
           <i class="fa fa-caret-down" aria-hidden="true"></i>
         </div>
         <div v-show="categoryType === 'classify'" class="sort-detail">
-          1111111
+          <section class="food-cat">
+            <ul>
+              <li v-for="(cat, index) in foodCategory" :key="index" :class="{active:restaurantCategoryId == cat.id}">
+                <div>
+                  <img v-if="index" :src="getImagePath(cat.image_url)" class="cat-img" />
+                  <span class="name">{{cat.name}}</span>
+                </div>
+                <div>
+                  <span class="num">{{cat.count}}</span><i v-if="index" class="fa fa-angle-right" aria-hidden="true"></i>
+                </div>
+              </li>
+            </ul>
+          </section>
+          <section class="food-sub-cat">
+            <ul>
+              <li v-for="(subCat, index) in getSubCatById(restaurantCategoryId)" v-if="index" :key="subCat.id">
+                <span>{{subCat.name}}</span>
+                <span>{{subCat.count}}</span>
+              </li>
+            </ul>
+          </section>
         </div>
       </section>
       <section>
@@ -37,10 +57,13 @@
 </template>
 
 <script>
+  import { mapState, mapGetters, mapActions } from 'vuex';
+  import { getImgPath } from '@/utils/image';
   import headerTop from '@/components/head/Head';
   import shopList from '@/components/common/ShopList';
 
   export default {
+    components: { headerTop, shopList },
     data() {
       return {
         geohash: '',
@@ -49,8 +72,21 @@
         categoryType: '',
       };
     },
-    components: { headerTop, shopList },
+    computed: {
+      ...mapState({
+        foodCategory: ({ food }) => food.foodCategory,
+      }),
+      ...mapGetters([
+        'getSubCatById',
+      ]),
+    },
     methods: {
+      ...mapActions([
+        'getFoodCategory',
+      ]),
+      getImagePath(path) {
+        return getImgPath(path);
+      },
       chooseCatType(type) {
         if (this.categoryType !== type) {
           this.categoryType = type;
@@ -61,7 +97,8 @@
       initData() {
         this.geohash = this.$route.query.geohash;
         this.headTitle = this.$route.query.title;
-        this.restaurantCategoryId = this.$route.query.restaurant_category_id;
+        this.restaurantCategoryId = parseInt(this.$route.query.restaurant_category_id, 10);
+        this.getFoodCategory(this.geohash.split(',')[0], this.geohash.split(',')[1]);
       },
     },
     created() {
@@ -97,11 +134,64 @@
         }
         .sort-detail {
           position: absolute;
+          display: flex;
           width: 100%;
           top: .32rem;
           left: 0;
           background-color: #fff;
           min-height: 1rem;
+          .food-cat {
+            width: 50%;
+            background-color: #f1f1f1;
+            ul {
+              li {
+                display: flex;
+                justify-content: space-between;
+                padding: 0 .1rem;
+                &.active {
+                  background-color: #fff;
+                }
+                div, span, i {
+                  font-size: .12rem;
+                }
+                .cat-img {
+                  width: .16rem;
+                  height: .16rem;
+                }
+                .name {
+                  color: #666;
+                }
+                .num {
+                  padding: 0 .04rem;
+                  margin-right: .06rem;
+                  border-radius: .1rem;
+                  color: #fff;
+                  background-color: #ccc;
+                }
+                .fa {
+                  font-size: .14rem;
+                  color: #ccc;
+                }
+              }
+            }
+          }
+          .food-sub-cat {
+            width: 50%;
+            background-color: #fff;
+            ul {
+              padding-left: .1rem;
+              li {
+                display: flex;
+                justify-content: space-between;
+                padding-right: .1rem;
+                border-bottom: .01rem solid #e4e4e4;
+                span {
+                  font-size: .12rem;
+                  color: #666;
+                }
+              }
+            }
+          }
         }
       }
     }

@@ -1,3 +1,4 @@
+/* eslint-disable import/prefer-default-export */
 import fetch from '@/utils/fetch';
 
 export function getShopList(latitude, longitude, offset, restaurantCategoryId = '', restaurantCategoryIds = '', orderBy = '', deliveryMode = '', supportIds = [], limit = 5) {
@@ -24,8 +25,4 @@ export function getShopList(latitude, longitude, offset, restaurantCategoryId = 
       keyword: '',
     },
   });
-}
-
-export function toBeRemoved() {
-  return null;
 }

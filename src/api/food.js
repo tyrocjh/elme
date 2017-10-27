@@ -12,6 +12,13 @@ export function getFoodTypes(geohash) {
   });
 }
 
-export function toBeRemoved() {
-  return null;
+export function getFoodCategory(latitude, longitude) {
+  return fetch({
+    url: '/shopping/v2/restaurant/category',
+    method: 'get',
+    params: {
+      latitude,
+      longitude,
+    },
+  });
 }
