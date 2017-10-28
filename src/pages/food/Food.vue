@@ -7,52 +7,59 @@
           <span>分类</span>
           <i class="fa fa-caret-down" aria-hidden="true"></i>
         </div>
-        <div v-show="categoryType === 'classify'" class="sort-detail">
-          <section class="food-cat">
-            <ul>
-              <li v-for="(cat, index) in foodCategory" :key="index" :class="{active:restaurantCategoryId == cat.id}">
-                <div>
-                  <img v-if="index" :src="getImagePath(cat.image_url)" class="cat-img" />
-                  <span class="name">{{cat.name}}</span>
-                </div>
-                <div>
-                  <span class="num">{{cat.count}}</span><i v-if="index" class="fa fa-angle-right" aria-hidden="true"></i>
-                </div>
-              </li>
-            </ul>
-          </section>
-          <section class="food-sub-cat">
-            <ul>
-              <li v-for="(subCat, index) in getSubCatById(restaurantCategoryId)" v-if="index" :key="subCat.id">
-                <span>{{subCat.name}}</span>
-                <span>{{subCat.count}}</span>
-              </li>
-            </ul>
-          </section>
-        </div>
+        <transition name="fade">
+          <div v-show="categoryType === 'classify'" class="sort-detail">
+            <section class="food-cat">
+              <ul>
+                <li v-for="(cat, index) in foodCategory" :key="index" :class="{active:restaurantCategoryId == cat.id}" @click="changeCategory(cat.id, index)">
+                  <div>
+                    <img v-if="index" :src="getImagePath(cat.image_url)" class="cat-img" />
+                    <span class="name">{{cat.name}}</span>
+                  </div>
+                  <div>
+                    <span class="num">{{cat.count}}</span><i v-if="index" class="fa fa-angle-right" aria-hidden="true"></i>
+                  </div>
+                </li>
+              </ul>
+            </section>
+            <section class="food-sub-cat">
+              <ul>
+                <li v-for="(subCat, index) in getSubCatById(restaurantCategoryId)" v-if="index" :key="subCat.id">
+                  <span>{{subCat.name}}</span>
+                  <span>{{subCat.count}}</span>
+                </li>
+              </ul>
+            </section>
+          </div>
+        </transition>
       </section>
       <section>
         <div class="sort-item" @click="chooseCatType('sort')">
           <span>排序</span>
           <i class="fa fa-caret-down" aria-hidden="true"></i>
         </div>
-        <div v-show="categoryType === 'sort'" class="sort-detail">
-          222222
-        </div>
+        <transition name="fade">
+          <div v-show="categoryType === 'sort'" class="sort-detail">
+            222222
+          </div>
+        </transition>
       </section>
       <section>
         <div class="sort-item" @click="chooseCatType('filter')">
           <span>筛选</span>
           <i class="fa fa-caret-down" aria-hidden="true"></i>
         </div>
-        <div v-show="categoryType === 'filter'" class="sort-detail">
-          33333333
-        </div>
+        <transition name="fade">
+          <div v-show="categoryType === 'filter'" class="sort-detail">
+            33333333
+          </div>
+        </transition>
       </section>
     </div>
     <div class="merchant">
       <shop-list v-if="geohash" :geohash="geohash"></shop-list>
     </div>
+    <div class="shadow" v-show="categoryType" @click="chooseCatType('')"></div>
   </div>
 </template>
 
@@ -87,6 +94,13 @@
       getImagePath(path) {
         return getImgPath(path);
       },
+      changeCategory(id, index) {
+        if (index === 0) {
+          this.categoryType = '';
+        } else {
+          this.restaurantCategoryId = id;
+        }
+      },
       chooseCatType(type) {
         if (this.categoryType !== type) {
           this.categoryType = type;
@@ -113,7 +127,7 @@
       display: flex;
       width: 100%;
       position: fixed;
-      z-index: 100;
+      z-index: 90;
       top: .45rem;
       height: .32rem;
       line-height: .32rem;
@@ -127,6 +141,9 @@
           border-right: none;
         }
         .sort-item {
+          position: relative;
+          z-index: 80;
+          background-color: #fff;
           span, i {
             font-size: .13rem;
             color: #999;
@@ -134,6 +151,7 @@
         }
         .sort-detail {
           position: absolute;
+          z-index: 50;
           display: flex;
           width: 100%;
           top: .32rem;
@@ -142,6 +160,7 @@
           min-height: 1rem;
           .food-cat {
             width: 50%;
+            height: 2.9rem;
             background-color: #f1f1f1;
             ul {
               li {
@@ -177,6 +196,8 @@
           }
           .food-sub-cat {
             width: 50%;
+            height: 2.9rem;
+            overflow-y: auto;
             background-color: #fff;
             ul {
               padding-left: .1rem;
@@ -198,6 +219,23 @@
     .merchant {
       padding-top: .77rem;
       background-color: #fff;
+    }
+    .shadow {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.3);
+      z-index: 10;
+    }
+    .fade-enter-active, .fade-leave-active {
+      transition: all .3s;
+      transform: translateY(0);
+    }
+    .fade-enter, .fade-leave-to {
+      opacity: 0;
+      transform: translateY(-100%);
     }
   }
 </style>
