@@ -44,7 +44,7 @@
 
   export default {
     directives: { infiniteScroll },
-    props: ['geohash', 'restaurantCategoryId'],
+    props: ['geohash', 'restaurantCatId', 'restaurantSubCatId'],
     data() {
       return {
         baseUrl,
@@ -62,13 +62,15 @@
         'getShopList',
         'changeOffset',
       ]),
-      getShopData() {
+      getShopData(reset) {
         this.disableLoadMore = true;
         this.getShopList({
           latitude: this.geohash.split(',')[0],
           longitude: this.geohash.split(',')[1],
-          restaurantCategoryId: this.restaurantCategoryId,
+          restaurantCategoryId: this.restaurantCatId,
+          restaurantCategoryIds: this.restaurantSubCatId,
           offset: this.offset,
+          reset,
         }).then((res) => {
           if (res.length === 5) {
             this.disableLoadMore = false;
@@ -91,11 +93,17 @@
         return flag;
       },
       initData() {
-        this.getShopData();
+        this.getShopData(true);
       },
     },
     created() {
       this.initData();
+    },
+    watch: {
+      restaurantSubCatId() {
+        this.changeOffset({ count: 0, reset: true });
+        this.getShopData(true);
+      },
     },
   };
 </script>

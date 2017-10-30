@@ -11,7 +11,7 @@
           <div v-show="categoryType === 'classify'" class="sort-detail">
             <section class="food-cat">
               <ul>
-                <li v-for="(cat, index) in foodCategory" :key="index" :class="{active:restaurantCategoryId == cat.id}" @click="changeCategory(cat.id, index)">
+                <li v-for="(cat, index) in foodCategory" :key="index" :class="{active:restaurantCatId == cat.id}" @click="changeCategory(cat.id, index)">
                   <div>
                     <img v-if="index" :src="getImagePath(cat.image_url)" class="cat-img" />
                     <span class="name">{{cat.name}}</span>
@@ -24,7 +24,7 @@
             </section>
             <section class="food-sub-cat">
               <ul>
-                <li v-for="(subCat, index) in getSubCatById(restaurantCategoryId)" v-if="index" :key="subCat.id">
+                <li v-for="(subCat, index) in getSubCatById(restaurantCatId)" v-if="index" :key="subCat.id" :class="{active:restaurantSubCatId == subCat.id}" @click="changeSubCategory(subCat.id)">
                   <span>{{subCat.name}}</span>
                   <span>{{subCat.count}}</span>
                 </li>
@@ -57,7 +57,7 @@
       </section>
     </div>
     <div class="merchant">
-      <shop-list v-if="geohash" :geohash="geohash"></shop-list>
+      <shop-list v-if="geohash" :geohash="geohash" :restaurantCatId="restaurantCatId" :restaurantSubCatId="restaurantSubCatId"></shop-list>
     </div>
     <div class="shadow" v-show="categoryType" @click="chooseCatType('')"></div>
   </div>
@@ -75,7 +75,8 @@
       return {
         geohash: '',
         headTitle: '',
-        restaurantCategoryId: '',
+        restaurantCatId: '',
+        restaurantSubCatId: '',
         categoryType: '',
       };
     },
@@ -97,9 +98,14 @@
       changeCategory(id, index) {
         if (index === 0) {
           this.categoryType = '';
+          this.restaurantSubCatId = '';
         } else {
-          this.restaurantCategoryId = id;
+          this.restaurantCatId = id;
         }
+      },
+      changeSubCategory(id) {
+        this.restaurantSubCatId = id;
+        this.categoryType = '';
       },
       chooseCatType(type) {
         if (this.categoryType !== type) {
@@ -111,7 +117,7 @@
       initData() {
         this.geohash = this.$route.query.geohash;
         this.headTitle = this.$route.query.title;
-        this.restaurantCategoryId = parseInt(this.$route.query.restaurant_category_id, 10);
+        this.restaurantCatId = parseInt(this.$route.query.restaurant_category_id, 10);
         this.getFoodCategory(this.geohash.split(',')[0], this.geohash.split(',')[1]);
       },
     },
@@ -206,6 +212,11 @@
                 justify-content: space-between;
                 padding-right: .1rem;
                 border-bottom: .01rem solid #e4e4e4;
+                &.active {
+                  span {
+                    color: #3190e8;
+                  }
+                }
                 span {
                   font-size: .12rem;
                   color: #666;

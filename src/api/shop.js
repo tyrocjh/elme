@@ -16,7 +16,7 @@ export function getShopList(latitude, longitude, offset, restaurantCategoryId = 
       latitude,
       longitude,
       offset,
-      restaurantCategoryId,
+      restaurant_category_id: restaurantCategoryId,
       'restaurant_category_ids[]': restaurantCategoryIds,
       orderBy,
       'delivery_mode[]': deliveryMode + supportStr,
