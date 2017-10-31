@@ -4,6 +4,10 @@ import Home from '@/pages/home/Home';
 import City from '@/pages/city/City';
 import Msite from '@/pages/msite/Msite';
 import Food from '@/pages/food/Food';
+import Shop from '@/pages/shop/Shop';
+import ShopDetail from '@/pages/shop/ShopDetail';
+import ShopSafe from '@/pages/shop/ShopSafe';
+import FoodDetail from '@/pages/shop/FoodDetail';
 
 Vue.use(Router);
 
@@ -25,6 +29,20 @@ export default new Router({
     }, {
       path: '/food',
       component: Food,
+    }, {
+      path: '/shop',
+      component: Shop,
+      children: [{
+        path: 'foodDetail',
+        component: FoodDetail,
+      }, {
+        path: 'shopDetail',
+        component: ShopDetail,
+        children: [{
+          path: 'shopSafe',
+          component: ShopSafe,
+        }],
+      }],
     },
   ],
 });

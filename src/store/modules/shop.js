@@ -11,10 +11,10 @@ const state = {
 
 const actions = {
   getShopList({ commit }, params) {
-    const { latitude, longitude, offset, restaurantCategoryId, restaurantCategoryIds, reset } = params;
+    const { latitude, longitude, offset, restaurantCategoryId, restaurantCategoryIds, sortByType, reset } = params;
     return new Promise((resolve, reject) => {
       commit(SHOP_REQUEST);
-      getShopList(latitude, longitude, offset, restaurantCategoryId, restaurantCategoryIds).then((res) => {
+      getShopList(latitude, longitude, offset, restaurantCategoryId, restaurantCategoryIds, sortByType).then((res) => {
         commit(SHOP_LIST, {
           data: res.data,
           reset,

@@ -1,7 +1,7 @@
 <template>
   <div class="shoplist-container">
     <ul v-infinite-scroll="loadMore" infinite-scroll-disabled="disableLoadMore" infinite-scroll-immediate-check=false>
-      <li v-for="(shop, index) in shopList" :key="shop.id" class="shop-item">
+      <router-link v-for="(shop, index) in shopList" :to="{path: 'shop', query:{geohash, id: shop.id}}" tag="li" :key="shop.id" class="shop-item">
         <section class="shop-image">
           <img class="shop-img" :src="baseUrl + '/img/' + shop.image_path" />
         </section>
@@ -31,7 +31,7 @@
             <p class="distance">{{shop.distance}} / <span>{{shop.order_lead_time}}</span></p>
           </footer>
         </section>
-      </li>
+      </router-link>
     </ul>
     <p class="no-more-tips" v-if="disableLoadMore">没有更多了...</p>
   </div>
@@ -44,7 +44,7 @@
 
   export default {
     directives: { infiniteScroll },
-    props: ['geohash', 'restaurantCatId', 'restaurantSubCatId'],
+    props: ['geohash', 'restaurantCatId', 'restaurantSubCatId', 'sortByType'],
     data() {
       return {
         baseUrl,
@@ -69,6 +69,7 @@
           longitude: this.geohash.split(',')[1],
           restaurantCategoryId: this.restaurantCatId,
           restaurantCategoryIds: this.restaurantSubCatId,
+          sortByType: this.sortByType,
           offset: this.offset,
           reset,
         }).then((res) => {
@@ -93,6 +94,7 @@
         return flag;
       },
       initData() {
+        this.changeOffset({ count: 0, reset: true });
         this.getShopData(true);
       },
     },
@@ -101,8 +103,10 @@
     },
     watch: {
       restaurantSubCatId() {
-        this.changeOffset({ count: 0, reset: true });
-        this.getShopData(true);
+        this.initData();
+      },
+      sortByType() {
+        this.initData();
       },
     },
   };

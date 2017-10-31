@@ -40,7 +40,38 @@
         </div>
         <transition name="fade">
           <div v-show="categoryType === 'sort'" class="sort-detail">
-            222222
+            <ul class="sort">
+              <li @click="sortList($event)" data-order="0" :class="{active: sortByType == 0}">
+                <i :style="{ color: iconColor[0] }" data- class="fa fa-sort" aria-hidden="true"></i>
+                <span>智能排序</span>
+                <i v-show="sortByType == 0" class="fa fa-check" aria-hidden="true"></i>
+              </li>
+              <li @click="sortList($event)" data-order="5" :class="{active: sortByType == 5}">
+                <i :style="{ color: iconColor[1] }" class="fa fa-map-marker" aria-hidden="true"></i>
+                <span>距离最近</span>
+                <i v-show="sortByType == 5" class="fa fa-check" aria-hidden="true"></i>
+              </li>
+              <li @click="sortList($event)" data-order="6" :class="{active: sortByType == 6}">
+                <i :style="{ color: iconColor[2] }" class="fa fa-tint" aria-hidden="true"></i>
+                <span>销量最高</span>
+                <i v-show="sortByType == 6" class="fa fa-check" aria-hidden="true"></i>
+              </li>
+              <li @click="sortList($event)" data-order="1" :class="{active: sortByType == 1}">
+                <i :style="{ color: iconColor[3] }" class="fa fa-cny" aria-hidden="true"></i>
+                <span>起送价最低</span>
+                <i v-show="sortByType == 1" class="fa fa-check" aria-hidden="true"></i>
+              </li>
+              <li @click="sortList($event)" data-order="2" :class="{active: sortByType == 2}">
+                <i :style="{ color: iconColor[4] }" class="fa fa-clock-o" aria-hidden="true"></i>
+                <span>配送速度最快</span>
+                <i v-show="sortByType == 2" class="fa fa-check" aria-hidden="true"></i>
+              </li>
+              <li @click="sortList($event)" data-order="3" :class="{active: sortByType == 3}">
+                <i :style="{ color: iconColor[5] }" class="fa fa-star-o" aria-hidden="true"></i>
+                <span>评分最高</span>
+                <i v-show="sortByType == 3" class="fa fa-check" aria-hidden="true"></i>
+              </li>
+            </ul>
           </div>
         </transition>
       </section>
@@ -51,13 +82,13 @@
         </div>
         <transition name="fade">
           <div v-show="categoryType === 'filter'" class="sort-detail">
-            33333333
+            敬请期待...
           </div>
         </transition>
       </section>
     </div>
     <div class="merchant">
-      <shop-list v-if="geohash" :geohash="geohash" :restaurantCatId="restaurantCatId" :restaurantSubCatId="restaurantSubCatId"></shop-list>
+      <shop-list v-if="geohash" :geohash="geohash" :restaurantCatId="restaurantCatId" :restaurantSubCatId="restaurantSubCatId" :sortByType="sortByType"></shop-list>
     </div>
     <div class="shadow" v-show="categoryType" @click="chooseCatType('')"></div>
   </div>
@@ -78,6 +109,8 @@
         restaurantCatId: '',
         restaurantSubCatId: '',
         categoryType: '',
+        sortByType: 0,
+        iconColor: ['#3b87c8', '#2a9bd3', '#f07373', '#e6b61a', '#37c7b7', '#eba53b'],
       };
     },
     computed: {
@@ -94,6 +127,10 @@
       ]),
       getImagePath(path) {
         return getImgPath(path);
+      },
+      sortList(e) {
+        this.sortByType = e.currentTarget.getAttribute('data-order');
+        this.categoryType = '';
       },
       changeCategory(id, index) {
         if (index === 0) {
@@ -221,6 +258,36 @@
                   font-size: .12rem;
                   color: #666;
                 }
+              }
+            }
+          }
+          ul.sort {
+            width: 100%;
+            text-align: left;
+            li {
+              position: relative;
+              height: .5rem;
+              line-height: .5rem;
+              padding-left: .25rem;
+              border-bottom: .005rem solid #e4e4e4;
+              &.active {
+                span, i {
+                  color: #3190e8 !important;
+                }
+              }
+              span, i {
+                font-size: .12rem;
+              }
+              span {
+                padding-left: .12rem;
+                color: #666;
+              }
+              .fa-check {
+                display: inline-block;
+                position: absolute;
+                right: .2rem;
+                height: .5rem;
+                line-height: .5rem;
               }
             }
           }
