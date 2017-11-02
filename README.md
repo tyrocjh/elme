@@ -33,7 +33,7 @@ For detailed explanation on how things work, checkout the [guide](http://vuejs-t
 
 # todos
 本地如何用手机访问
-不同分辨率下，一行显示的文字数量一样，这不应该呀
+适配不同宽度（不同分辨率下，一行显示的文字数量一样，这不应该呀）
 加loading
 加墓碑效果
 要不要加入layout.vue
