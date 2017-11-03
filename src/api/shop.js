@@ -1,4 +1,3 @@
-/* eslint-disable import/prefer-default-export */
 import fetch from '@/utils/fetch';
 
 export function getShopList(latitude, longitude, offset, restaurantCategoryId = '', restaurantCategoryIds = '', orderBy = '', deliveryMode = '', supportIds = [], limit = 5) {
@@ -23,6 +22,27 @@ export function getShopList(latitude, longitude, offset, restaurantCategoryId = 
       limit,
       'extras[]': 'activities',
       keyword: '',
+    },
+  });
+}
+
+export function getShopDetail(shopid, latitude, longitude) {
+  return fetch({
+    url: `/shopping/restaurant/${shopid}`,
+    method: 'get',
+    params: {
+      latitude,
+      longitude: `${longitude}&extras[]=activities&extras[]=album&extras[]=license&extras[]=identification&extras[]=statistics`,
+    },
+  });
+}
+
+export function getMenus(restaurantId) {
+  return fetch({
+    url: '/shopping/v2/menu',
+    method: 'get',
+    params: {
+      restaurant_id: restaurantId,
     },
   });
 }

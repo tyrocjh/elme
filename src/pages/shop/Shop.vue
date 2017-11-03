@@ -1,23 +1,23 @@
 <template>
   <div>
-    <!--<header class="shop-header">-->
-      <!--<img class="header-bg" src="http://cangdu.org:8001/img/15e386ec1875697.jpeg" />-->
-      <!--<div class="header-container">-->
-        <!--<section class="top">-->
-          <!--<img src="http://cangdu.org:8001/img/15e386ec1875697.jpeg" />-->
-          <!--<div class="msg">-->
-            <!--<h2>效果演示</h2>-->
-            <!--<p>商家配送/分钟送达/配送费</p>-->
-            <!--<p>公告：好好吃好好吃</p>-->
-            <!--<i class="fa fa-angle-right" aria-hidden="true"></i>-->
-          <!--</div>-->
-        <!--</section>-->
-        <!--<section class="bottom">-->
-          <!--<p>满30减5，满60减8（APP专享）</p>-->
-          <!--<span>1个活动<i class="fa fa-angle-right" aria-hidden="true"></i></span>-->
-        <!--</section>-->
-      <!--</div>-->
-    <!--</header>-->
+    <header class="shop-header">
+      <img class="header-bg" :src="baseUrl + '/img/' + shopDetail.image_path" />
+      <div class="header-container">
+        <section class="top">
+          <img :src="baseUrl + '/img/' + shopDetail.image_path" />
+          <div class="msg">
+            <h2>{{shopDetail.name}}</h2>
+            <p>商家配送 / {{shopDetail.order_lead_time}}分钟送达 / 配送费￥{{shopDetail.float_delivery_fee}}</p>
+            <p>公告：{{promotionInfo}}</p>
+            <i class="fa fa-angle-right" aria-hidden="true"></i>
+          </div>
+        </section>
+        <section class="bottom">
+          <p>{{shopDetail.activities ? shopDetail.activities[0].description : ''}}</p>
+          <span>{{shopDetail.activities.length}}个活动<i class="fa fa-angle-right" aria-hidden="true"></i></span>
+        </section>
+      </div>
+    </header>
     <section class="tool-bar">
       <div @click="changeCatType('food')"><span :class="{active: catType == 'food'}">商品</span></div>
       <div @click="changeCatType('rating')"><span :class="{active: catType == 'rating'}">评价</span></div>
@@ -27,62 +27,60 @@
         <div v-show="catType == 'food'" class="shop-merchandise">
           <section class="merchandise-l">
             <ul>
-              <li>
-                <img src="https://fuss10.elemecdn.com/4/73/5c4342691749b8e1a531149a46117jpeg.jpeg" />
-                <span>优惠</span>
-              </li>
-              <li class="active">
-                <img src="https://fuss10.elemecdn.com/4/73/5c4342691749b8e1a531149a46117jpeg.jpeg" />
-                <span>优惠</span>
-              </li>
-              <li>
-                <span>优惠</span>
-              </li>
-              <li class="active">
-                <span>优惠</span>
+              <li v-for="(menu, index) in menus" :class="{active: index == menuIndex}" :key="index" @click="changeMenu(index)">
+                <img v-if="menu.icon_url" :src="getImagePath(menu.icon_url)" />
+                <span>{{menu.name}}</span>
               </li>
             </ul>
           </section>
           <section class="merchandise-r">
-            <header>
-              <h4><strong>优惠</strong>美味又实惠，大家快来抢！</h4><span>···</span>
-            </header>
             <ul class="food-list">
-              <li>
-                <img src="http://cangdu.org:8001/img/15e3880a1525709.jpeg" />
-                <section class="food-detail">
-                  <h5>比萨</h5>
-                  <p>此处一共20个字不信你看看咯此处一共20个</p>
-                  <span>月售605份 好评率45%</span>
-                  <div class="detail-bottom">
-                    <span>￥20</span>
-                    <i class="fa fa-plus-circle" aria-hidden="true"></i>
-                  </div>
-                </section>
+              <li v-for="menu in menus" :key="menu.id" >
+                <header>
+                  <h4><strong>{{menu.name}}</strong>{{menu.description}}</h4><span>···</span>
+                </header>
+                <div  v-for="food in menu.foods" class="food-content" :key="food.id">
+                  <img :src="baseUrl + '/img/' + food.image_path" />
+                  <section class="food-detail">
+                    <h5>{{food.name}}</h5>
+                    <p>{{food.description}}</p>
+                    <span>月售{{food.month_sales}}份 好评率{{food.satisfy_rate}}%</span>
+                    <div class="detail-bottom">
+                      <span>￥{{food.specfoods[0].price}}</span>
+                      <i class="fa fa-plus-circle" aria-hidden="true"></i>
+                    </div>
+                  </section>
+                </div>
               </li>
+
               <li>
-                <img src="http://cangdu.org:8001/img/15e3880a1525709.jpeg" />
-                <section class="food-detail">
-                  <h5>比萨</h5>
-                  <p>此处一共20个字不信你看看咯此处一共20个</p>
-                  <span>月售605份 好评率45%</span>
-                  <div class="detail-bottom">
-                    <span>￥20</span>
-                    <i class="fa fa-plus-circle" aria-hidden="true"></i>
-                  </div>
-                </section>
-              </li>
-              <li>
-                <img src="http://cangdu.org:8001/img/15e3880a1525709.jpeg" />
-                <section class="food-detail">
-                  <h5>比萨</h5>
-                  <p>此处一共20个字不信你看看咯此处一共20个</p>
-                  <span>月售605份 好评率45%</span>
-                  <div class="detail-bottom">
-                    <span>￥20</span>
-                    <i class="fa fa-plus-circle" aria-hidden="true"></i>
-                  </div>
-                </section>
+                <header>
+                  <h4><strong>优惠</strong>美味又实惠，大家快来抢！</h4><span>···</span>
+                </header>
+                <div class="food-content">
+                  <img src="http://cangdu.org:8001/img/15e3880a1525709.jpeg" />
+                  <section class="food-detail">
+                    <h5>比萨</h5>
+                    <p>此处一共20个字不信你看看咯此处一共20个</p>
+                    <span>月售605份 好评率45%</span>
+                    <div class="detail-bottom">
+                      <span>￥20</span>
+                      <i class="fa fa-plus-circle" aria-hidden="true"></i>
+                    </div>
+                  </section>
+                </div>
+                <div class="food-content">
+                  <img src="http://cangdu.org:8001/img/15e3880a1525709.jpeg" />
+                  <section class="food-detail">
+                    <h5>比萨</h5>
+                    <p>此处一共20个字不信你看看咯此处一共20个</p>
+                    <span>月售605份 好评率45%</span>
+                    <div class="detail-bottom">
+                      <span>￥20</span>
+                      <i class="fa fa-plus-circle" aria-hidden="true"></i>
+                    </div>
+                  </section>
+                </div>
               </li>
             </ul>
           </section>
@@ -179,16 +177,54 @@
 </template>
 
 <script>
+  import { mapState, mapActions } from 'vuex';
+  import { baseUrl } from '@/config/env';
+  import { getImgPath } from '@/utils/image';
+
   export default {
     data() {
       return {
-        catType: 'rating',
+        baseUrl,
+        menuIndex: 0,
+        catType: 'food',
       };
     },
+    computed: {
+      ...mapState({
+        shopDetail: ({ shop }) => shop.shopDetail,
+        menus: ({ shop }) => shop.menus,
+      }),
+      promotionInfo() {
+        return this.shopDetail.promotion_info || '欢迎光临，用餐高峰期请提前下单，谢谢。';
+      },
+    },
     methods: {
+      ...mapActions([
+        'getShopDetail',
+        'getMenus',
+      ]),
+      getImagePath(path) {
+        return getImgPath(path);
+      },
       changeCatType(type) {
         this.catType = type;
       },
+      changeMenu(index) {
+        this.menuIndex = index;
+      },
+      initData() {
+        this.geohash = this.$route.query.geohash;
+        this.shopId = this.$route.query.id;
+        this.getShopDetail({
+          shopid: this.shopId,
+          latitude: this.geohash.split(',')[0],
+          longitude: this.geohash.split(',')[1],
+        });
+        this.getMenus(this.shopId);
+      },
+    },
+    created() {
+      this.initData();
     },
   };
 </script>
@@ -298,57 +334,62 @@
       }
       .merchandise-r {
         flex: 1;
-        > header {
-          display: flex;
-          justify-content: space-between;
-          line-height: 0.35rem;
-          padding: 0 .1rem;
-          h4 {
-            font-size: .12rem;
-            color: #999;
-            padding-right: .06rem;
-            strong {
-              font-size: .14rem;
-              font-weight: 700;
-              color: #666;
-            }
-          }
-          > span {
-            color: #bbb;
-          }
-        }
         ul.food-list {
           li {
-            display: flex;
-            padding: .1rem;
-            background-color: #fff;
-            border-bottom: .01rem solid #f8f8f8;
-            img {
-              width: .4rem;
-              height: .4rem;
-              margin-right: .08rem;
-            }
-            .food-detail {
-              position: relative;
-              h5, p, span {
+            > header {
+              display: flex;
+              justify-content: space-between;
+              line-height: 0.35rem;
+              padding: 0 .1rem;
+              h4 {
                 font-size: .12rem;
-                color: #333;
-              }
-              h5 {
-                font-size: .14rem;
-              }
-              p {
                 color: #999;
-              }
-              .detail-bottom {
-                display: flex;
-                justify-content: space-between;
-                span {
+                padding-right: .06rem;
+                strong {
                   font-size: .14rem;
-                  color: #f60;
+                  font-weight: 700;
+                  color: #666;
+                  margin-right: .05rem;
                 }
-                .fa {
-                  color: #3190e8;
+              }
+              > span {
+                color: #bbb;
+              }
+            }
+            .food-content {
+              display: flex;
+              padding: .1rem;
+              border-bottom: .01rem solid #f8f8f8;
+              background-color: #fff;
+              img {
+                width: .4rem;
+                height: .4rem;
+                margin-right: .08rem;
+              }
+              .food-detail {
+                position: relative;
+                flex: 1;
+                h5, p, span {
+                  font-size: .12rem;
+                  color: #333;
+                }
+                h5 {
+                  font-size: .14rem;
+                  font-weight: 700;
+                }
+                p {
+                  color: #999;
+                }
+                .detail-bottom {
+                  display: flex;
+                  justify-content: space-between;
+                  span {
+                    font-size: .14rem;
+                    color: #f60;
+                  }
+                  .fa {
+                    color: #3190e8;
+                  }
                 }
               }
             }

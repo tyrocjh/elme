@@ -11,6 +11,8 @@ export const FOOD_REQUEST = 'FOOD_REQUEST';
 export const FOOD_REQUEST_FAILED = 'FOOD_REQUEST_FAILED';
 
 export const SHOP_LIST = 'SHOP_LIST';
+export const SHOP_DETAIL = 'SHOP_DETAIL';
+export const SHOP_MENUS = 'SHOP_MENUS';
 export const SHOP_OFFSET = 'SHOP_OFFSET';
 export const SHOP_REQUEST = 'SHOP_REQUEST';
 export const SHOP_REQUEST_FAILED = 'SHOP_REQUEST_FAILED';
