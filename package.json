@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "axios": "^0.16.2",
+    "better-scroll": "^1.4.0",
     "element-ui": "^1.4.7",
     "font-awesome": "^4.7.0",
     "lodash": "^4.17.4",

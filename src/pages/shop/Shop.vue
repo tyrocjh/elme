@@ -14,7 +14,7 @@
         </section>
         <section class="bottom">
           <p>{{shopDetail.activities ? shopDetail.activities[0].description : ''}}</p>
-          <span>{{shopDetail.activities.length}}个活动<i class="fa fa-angle-right" aria-hidden="true"></i></span>
+          <span>{{shopDetail.activities ? shopDetail.activities.length : ''}}个活动<i class="fa fa-angle-right" aria-hidden="true"></i></span>
         </section>
       </div>
     </header>
@@ -27,7 +27,7 @@
         <div v-show="catType == 'food'" class="shop-merchandise">
           <section class="merchandise-l">
             <ul>
-              <li v-for="(menu, index) in menus" :class="{active: index == menuIndex}" :key="index" @click="changeMenu(index)">
+              <li v-for="(menu, index) in menus" ref="menuGroup" :class="{active: index == menuIndex}" :key="index" @click="changeMenu(index)">
                 <img v-if="menu.icon_url" :src="getImagePath(menu.icon_url)" />
                 <span>{{menu.name}}</span>
               </li>
@@ -35,7 +35,7 @@
           </section>
           <section class="merchandise-r">
             <ul class="food-list">
-              <li v-for="menu in menus" :key="menu.id" >
+              <li v-for="menu in menus" ref="foodGroup" :key="menu.id" >
                 <header>
                   <h4><strong>{{menu.name}}</strong>{{menu.description}}</h4><span>···</span>
                 </header>
@@ -47,36 +47,6 @@
                     <span>月售{{food.month_sales}}份 好评率{{food.satisfy_rate}}%</span>
                     <div class="detail-bottom">
                       <span>￥{{food.specfoods[0].price}}</span>
-                      <i class="fa fa-plus-circle" aria-hidden="true"></i>
-                    </div>
-                  </section>
-                </div>
-              </li>
-
-              <li>
-                <header>
-                  <h4><strong>优惠</strong>美味又实惠，大家快来抢！</h4><span>···</span>
-                </header>
-                <div class="food-content">
-                  <img src="http://cangdu.org:8001/img/15e3880a1525709.jpeg" />
-                  <section class="food-detail">
-                    <h5>比萨</h5>
-                    <p>此处一共20个字不信你看看咯此处一共20个</p>
-                    <span>月售605份 好评率45%</span>
-                    <div class="detail-bottom">
-                      <span>￥20</span>
-                      <i class="fa fa-plus-circle" aria-hidden="true"></i>
-                    </div>
-                  </section>
-                </div>
-                <div class="food-content">
-                  <img src="http://cangdu.org:8001/img/15e3880a1525709.jpeg" />
-                  <section class="food-detail">
-                    <h5>比萨</h5>
-                    <p>此处一共20个字不信你看看咯此处一共20个</p>
-                    <span>月售605份 好评率45%</span>
-                    <div class="detail-bottom">
-                      <span>￥20</span>
                       <i class="fa fa-plus-circle" aria-hidden="true"></i>
                     </div>
                   </section>
@@ -178,6 +148,7 @@
 
 <script>
   import { mapState, mapActions } from 'vuex';
+  import BScroll from 'better-scroll';
   import { baseUrl } from '@/config/env';
   import { getImgPath } from '@/utils/image';
 
@@ -187,6 +158,8 @@
         baseUrl,
         menuIndex: 0,
         catType: 'food',
+        foodListScrollY: -1,
+        foodListHeight: [],
       };
     },
     computed: {
@@ -206,11 +179,23 @@
       getImagePath(path) {
         return getImgPath(path);
       },
+      calFoodListHeight() {
+        this.$refs.foodGroup.forEach((item, idx) => {
+          if (idx === 0) {
+            this.foodListHeight.push(item.clientHeight);
+          } else {
+            this.foodListHeight.push(item.clientHeight + this.foodListHeight[idx - 1]);
+          }
+        });
+      },
       changeCatType(type) {
         this.catType = type;
       },
       changeMenu(index) {
         this.menuIndex = index;
+        const tmpIndex = index > 2 ? index - 2 : 0;
+        this.merMenus.scrollToElement(this.$refs.menuGroup[tmpIndex], 200);
+        this.merFoods.scrollToElement(this.$refs.foodGroup[index], 400);
       },
       initData() {
         this.geohash = this.$route.query.geohash;
@@ -220,11 +205,47 @@
           latitude: this.geohash.split(',')[0],
           longitude: this.geohash.split(',')[1],
         });
-        this.getMenus(this.shopId);
+        this.getMenus(this.shopId).then(() => {
+          this.calFoodListHeight();
+          this.merMenus = new BScroll('.merchandise-l', {
+            bounce: false,
+            scrollY: true,
+            click: true,
+          });
+          this.merFoods = new BScroll('.merchandise-r', {
+            scrollY: true,
+            probeType: 3,
+          });
+          this.merFoods.on('scroll', (pos) => {
+            this.foodListScrollY = -pos.y;
+          });
+        });
       },
     },
     created() {
       this.initData();
+    },
+    watch: {
+      foodListScrollY(scrollY) {
+        const listH = this.foodListHeight;
+        let curIndex = 0;
+        for (let i = 0; i < listH.length - 1; i += 1) {
+          console.info('i: ', i);
+          console.info('scrollY: ', scrollY);
+          console.info('listH[i]: ', listH[i]);
+          console.info('listH[i + 1]: ', listH[i + 1]);
+          if (listH[i] <= scrollY + i + 1 && listH[i + 1] >= scrollY + i + 1) {
+            curIndex = i + 1;
+            break;
+          } else if (scrollY + i + 1 <= listH[i]) {
+            curIndex = 0;
+            break;
+          }
+        }
+        this.menuIndex = curIndex;
+        curIndex = curIndex > 2 ? curIndex - 2 : 0;
+        this.merMenus.scrollToElement(this.$refs.menuGroup[curIndex], 0);
+      },
     },
   };
 </script>
@@ -232,6 +253,7 @@
 <style rel="stylesheet/scss" lang="scss" scoped>
   .shop-header {
     position: relative;
+    height: 1.05rem;
     overflow: hidden;
     h2, p, span, i {
       font-size: .12rem;
@@ -286,6 +308,7 @@
   }
   .tool-bar {
     display: flex;
+    height: .4rem;
     background-color: #fff;
     border-bottom: .01rem solid #ebebeb;
     div {
@@ -305,10 +328,16 @@
     }
   }
   .shop-container {
+    position: absolute;
+    top: 1.45rem;
+    left: 0;
+    bottom: 0;
     .shop-merchandise {
       display: flex;
+      height: 100%;
       .merchandise-l {
         width: 24%;
+        overflow: hidden;
         li {
           height: .54rem;
           line-height: .54rem;
@@ -334,6 +363,7 @@
       }
       .merchandise-r {
         flex: 1;
+        overflow: hidden;
         ul.food-list {
           li {
             > header {
