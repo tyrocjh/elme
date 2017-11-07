@@ -37,7 +37,7 @@
             <ul class="food-list">
               <li v-for="menu in menus" ref="foodGroup" :key="menu.id" >
                 <header>
-                  <h4><strong>{{menu.name}}</strong>{{menu.description}}</h4><span>···</span>
+                  <h4><strong>{{menu.name}}</strong>{{menu.description}}</h4>
                 </header>
                 <div  v-for="food in menu.foods" class="food-content" :key="food.id">
                   <img :src="baseUrl + '/img/' + food.image_path" />
@@ -58,88 +58,47 @@
       </transition>
       <transition name="fade">
         <div v-show="catType == 'rating'" class="shop-comment">
-          <section class="score">
-            <div class="total">
-              <h5>4.4</h5>
-              <p>综合评价</p>
-              <span>高于周边商家76.9%</span>
-            </div>
-            <div class="detail">
-              <p>服务态度<span>4.7</span></p>
-              <p>菜品评价<span>4.7</span></p>
-              <p>送达时间<span class="time">分钟</span></p>
-            </div>
-          </section>
-          <ul class="tag-list">
-            <li class="active">全部（567）</li>
-            <li>满意（123）</li>
-            <li>不满意（23）</li>
-            <li>食材新鲜（5）</li>
-            <li>有图（56）</li>
-            <li>味道好（111）</li>
-          </ul>
-          <ul class="comment-list">
-            <li>
-              <img src="http://test.fe.ptdev.cn/elm/elmlogo.jpeg" />
-              <section>
-                <header>
-                  <span>4****b</span>
-                  <span class="time">2017-02-10</span>
-                </header>
+          <div>
+            <section v-if="ratingScores" class="score">
+              <div class="total">
+                <h5>{{shopDetail.rating}}</h5>
+                <p>综合评价</p>
+                <span>高于周边商家{{(ratingScores.compare_rating * 100).toFixed(1)}}%</span>
+              </div>
+              <div class="detail">
+                <p>服务态度<el-rate v-model="ratingScores.service_score" disabled></el-rate><span>{{ratingScores.service_score.toFixed(1)}}</span></p>
+                <p>菜品评价<el-rate v-model="ratingScores.food_score" disabled></el-rate><span>{{ratingScores.food_score.toFixed(1)}}</span></p>
+                <p v-if="shopDetail.order_lead_time">送达时间<span class="time">{{shopDetail.order_lead_time}}分钟</span></p>
+              </div>
+            </section>
+            <ul class="tag-list">
+              <li v-for="(ratingTag, index) in ratingTags" :class="{active: ratingTagIndex == index}" @click="changeRatingTag(ratingTag.name, index)" :key="index">{{ratingTag.name}}({{ratingTag.count}})</li>
+            </ul>
+            <ul v-if="ratingList" class="comment-list" v-infinite-scroll="loadMore" infinite-scroll-disabled="disableLoadMore" infinite-scroll-immediate-check=false>
+              <li v-for="item in ratingList" :key="item._id">
+                <img :src="getImagePath(item.avatar)" />
                 <section>
-                  <span>按时送达</span>
-                  <div>
-                    <img src="https://fuss10.elemecdn.com/d/c8/64033625905f0a15a2d181d53a425jpeg.jpeg" />
-                    <img src="https://fuss10.elemecdn.com/d/c8/64033625905f0a15a2d181d53a425jpeg.jpeg" />
-                  </div>
+                  <header>
+                    <span>{{item.username}}</span>
+                    <span class="time">{{item.rated_at}}</span>
+                  </header>
+                  <section>
+                    <span>{{item.time_spent_desc}}</span>
+                    <div>
+                      <template v-for="itemRating in item.item_ratings">
+                        <img :src="getImagePath(itemRating.image_hash)" />
+                      </template>
+                    </div>
+                  </section>
+                  <footer>
+                    <template v-for="itemRating in item.item_ratings">
+                      <span class="ellipsis">{{itemRating.food_name}}</span>
+                    </template>
+                  </footer>
                 </section>
-                <footer>
-                  <span>超级...</span>
-                  <span>韩式...</span>
-                </footer>
-              </section>
-            </li>
-            <li>
-              <img src="http://test.fe.ptdev.cn/elm/elmlogo.jpeg" />
-              <section>
-                <header>
-                  <span>4****b</span>
-                  <span class="time">2017-02-10</span>
-                </header>
-                <section>
-                  <span>按时送达</span>
-                  <div>
-                    <img src="https://fuss10.elemecdn.com/d/c8/64033625905f0a15a2d181d53a425jpeg.jpeg" />
-                    <img src="https://fuss10.elemecdn.com/d/c8/64033625905f0a15a2d181d53a425jpeg.jpeg" />
-                  </div>
-                </section>
-                <footer>
-                  <span>超级...</span>
-                  <span>韩式...</span>
-                </footer>
-              </section>
-            </li>
-            <li>
-              <img src="http://test.fe.ptdev.cn/elm/elmlogo.jpeg" />
-              <section>
-                <header>
-                  <span>4****b</span>
-                  <span class="time">2017-02-10</span>
-                </header>
-                <section>
-                  <span>按时送达</span>
-                  <div>
-                    <img src="https://fuss10.elemecdn.com/d/c8/64033625905f0a15a2d181d53a425jpeg.jpeg" />
-                    <img src="https://fuss10.elemecdn.com/d/c8/64033625905f0a15a2d181d53a425jpeg.jpeg" />
-                  </div>
-                </section>
-                <footer>
-                  <span>超级...</span>
-                  <span>韩式...</span>
-                </footer>
-              </section>
-            </li>
-          </ul>
+              </li>
+            </ul>
+          </div>
         </div>
       </transition>
     </section>
@@ -149,23 +108,32 @@
 <script>
   import { mapState, mapActions } from 'vuex';
   import BScroll from 'better-scroll';
+  import infiniteScroll from 'vue-infinite-scroll';
   import { baseUrl } from '@/config/env';
   import { getImgPath } from '@/utils/image';
 
   export default {
+    directives: { infiniteScroll },
     data() {
       return {
         baseUrl,
         menuIndex: 0,
-        catType: 'food',
+        ratingTagIndex: 0,
+        ratingTagName: '',
+        ratingListOffset: 0,
+        catType: 'rating',
         foodListScrollY: -1,
         foodListHeight: [],
+        disableLoadMore: false,
       };
     },
     computed: {
       ...mapState({
         shopDetail: ({ shop }) => shop.shopDetail,
         menus: ({ shop }) => shop.menus,
+        ratingScores: ({ shop }) => shop.ratingScores,
+        ratingTags: ({ shop }) => shop.ratingTags,
+        ratingList: ({ shop }) => shop.ratingList,
       }),
       promotionInfo() {
         return this.shopDetail.promotion_info || '欢迎光临，用餐高峰期请提前下单，谢谢。';
@@ -175,6 +143,9 @@
       ...mapActions([
         'getShopDetail',
         'getMenus',
+        'getRatingScores',
+        'getRatingTags',
+        'getRatingList',
       ]),
       getImagePath(path) {
         return getImgPath(path);
@@ -188,6 +159,16 @@
           }
         });
       },
+      changeRatingTag(name, index) {
+        this.ratingTagIndex = index;
+        this.ratingTagName = name;
+        this.ratingListOffset = 0;
+        this.getRatingList({
+          shopId: this.shopId,
+          offset: this.ratingListOffset,
+          tagName: this.ratingTagName,
+        });
+      },
       changeCatType(type) {
         this.catType = type;
       },
@@ -196,6 +177,19 @@
         const tmpIndex = index > 2 ? index - 2 : 0;
         this.merMenus.scrollToElement(this.$refs.menuGroup[tmpIndex], 200);
         this.merFoods.scrollToElement(this.$refs.foodGroup[index], 400);
+      },
+      loadMore() {
+        this.disableLoadMore = true;
+        this.ratingListOffset += 5;
+        this.getRatingList({
+          shopId: this.shopId,
+          offset: this.ratingListOffset,
+          tagName: this.ratingTagName,
+        }).then((result) => {
+          if (result.length === 10) {
+            this.disableLoadMore = false;
+          }
+        });
       },
       initData() {
         this.geohash = this.$route.query.geohash;
@@ -220,6 +214,21 @@
             this.foodListScrollY = -pos.y;
           });
         });
+        this.getRatingScores(this.shopId);
+        this.getRatingTags(this.shopId);
+        this.getRatingList({
+          shopId: this.shopId,
+          offset: this.ratingListOffset,
+          tagName: this.ratingTagName,
+          reset: true,
+        }).then(() => {
+//          this.ratList = new BScroll('.shop-comment', {
+//            bounce: false,
+//            scrollY: true,
+//            probeType: 3,
+//            click: true,
+//          });
+        });
       },
     },
     created() {
@@ -230,10 +239,6 @@
         const listH = this.foodListHeight;
         let curIndex = 0;
         for (let i = 0; i < listH.length - 1; i += 1) {
-          console.info('i: ', i);
-          console.info('scrollY: ', scrollY);
-          console.info('listH[i]: ', listH[i]);
-          console.info('listH[i + 1]: ', listH[i + 1]);
           if (listH[i] <= scrollY + i + 1 && listH[i + 1] >= scrollY + i + 1) {
             curIndex = i + 1;
             break;
@@ -428,12 +433,15 @@
       }
     }
     .shop-comment {
+      height: 100%;
+      overflow: auto;
       .score {
         display: flex;
-        margin-bottom: .12rem;
+        margin-bottom: .08rem;
         padding: .2rem;
         background-color: #fff;
         .total {
+          flex: 0.9;
           text-align: center;
           h5 {
             font-size: .24rem;
@@ -451,7 +459,12 @@
         .detail {
           flex: 1;
           text-align: center;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
           p {
+            display: flex;
+            justify-content: space-between;
             font-size: .13rem;
             color: #666;
             line-height: .22rem;
@@ -517,8 +530,11 @@
               }
             }
             footer span {
+              display: inline-block;
+              width: .6rem;
               color: #999;
               padding: .04rem;
+              margin-right: .05rem;
               border: .005rem solid #ebebeb;
             }
           }
@@ -534,5 +550,14 @@
   }
   .fade-enter, .fade-leave-to {
     opacity: 0;
+  }
+</style>
+
+<style rel="stylesheet/scss" lang="scss">
+  .el-rate__icon,
+  .el-icon-star-on {
+    font-size: .12rem;
+    margin-right: -.02rem;
+    transform: scale(.8);
   }
 </style>

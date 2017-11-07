@@ -46,3 +46,30 @@ export function getMenus(restaurantId) {
     },
   });
 }
+
+export function getRatingScores(shopid) {
+  return fetch({
+    url: `/ugc/v2/restaurants/${shopid}/ratings/scores`,
+    method: 'get',
+  });
+}
+
+export function getRatingTags(shopid) {
+  return fetch({
+    url: `/ugc/v2/restaurants/${shopid}/ratings/tags`,
+    method: 'get',
+  });
+}
+
+export function getRatingList(shopid, offset, tagName = '') {
+  return fetch({
+    url: `/ugc/v2/restaurants/${shopid}/ratings`,
+    method: 'get',
+    params: {
+      has_content: true,
+      offset,
+      limit: 10,
+      tag_name: tagName,
+    },
+  });
+}
