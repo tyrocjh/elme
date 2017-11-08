@@ -74,7 +74,7 @@
             <ul class="tag-list">
               <li v-for="(ratingTag, index) in ratingTags" :class="{active: ratingTagIndex == index}" @click="changeRatingTag(ratingTag.name, index)" :key="index">{{ratingTag.name}}({{ratingTag.count}})</li>
             </ul>
-            <ul v-if="ratingList" class="comment-list" v-infinite-scroll="loadMore" infinite-scroll-disabled="disableLoadMore" infinite-scroll-immediate-check=false>
+            <ul v-if="ratingList" class="comment-list">
               <li v-for="item in ratingList" :key="item._id">
                 <img :src="getImagePath(item.avatar)" />
                 <section>
@@ -108,12 +108,10 @@
 <script>
   import { mapState, mapActions } from 'vuex';
   import BScroll from 'better-scroll';
-  import infiniteScroll from 'vue-infinite-scroll';
   import { baseUrl } from '@/config/env';
   import { getImgPath } from '@/utils/image';
 
   export default {
-    directives: { infiniteScroll },
     data() {
       return {
         baseUrl,
@@ -121,7 +119,7 @@
         ratingTagIndex: 0,
         ratingTagName: '',
         ratingListOffset: 0,
-        catType: 'rating',
+        catType: 'food',
         foodListScrollY: -1,
         foodListHeight: [],
         disableLoadMore: false,
@@ -171,6 +169,21 @@
       },
       changeCatType(type) {
         this.catType = type;
+        if (type === 'rating') {
+          this.$nextTick(() => {
+            this.merRating = new BScroll('.shop-comment', {
+              bounce: false,
+              scrollY: true,
+              click: true,
+              probeType: 3,
+            });
+            this.merRating.on('scroll', (pos) => {
+              if (-pos.y >= -this.merRating.maxScrollY && !this.disableLoadMore) {
+                this.loadMore();
+              }
+            });
+          });
+        }
       },
       changeMenu(index) {
         this.menuIndex = index;
@@ -186,6 +199,7 @@
           offset: this.ratingListOffset,
           tagName: this.ratingTagName,
         }).then((result) => {
+          this.merRating.refresh();
           if (result.length === 10) {
             this.disableLoadMore = false;
           }
@@ -221,13 +235,6 @@
           offset: this.ratingListOffset,
           tagName: this.ratingTagName,
           reset: true,
-        }).then(() => {
-//          this.ratList = new BScroll('.shop-comment', {
-//            bounce: false,
-//            scrollY: true,
-//            probeType: 3,
-//            click: true,
-//          });
         });
       },
     },
@@ -434,7 +441,7 @@
     }
     .shop-comment {
       height: 100%;
-      overflow: auto;
+      overflow: hidden;
       .score {
         display: flex;
         margin-bottom: .08rem;
