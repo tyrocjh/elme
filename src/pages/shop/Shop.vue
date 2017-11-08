@@ -1,9 +1,12 @@
 <template>
   <div>
+    <nav class="go-back" @click="goBack">
+      <i class="fa fa-angle-left" aria-hidden="true"></i>
+    </nav>
     <header class="shop-header">
       <img class="header-bg" :src="baseUrl + '/img/' + shopDetail.image_path" />
       <div class="header-container">
-        <section class="top">
+        <router-link to="/shop/shopDetail" tag="section" class="top">
           <img :src="baseUrl + '/img/' + shopDetail.image_path" />
           <div class="msg">
             <h2>{{shopDetail.name}}</h2>
@@ -11,7 +14,7 @@
             <p>公告：{{promotionInfo}}</p>
             <i class="fa fa-angle-right" aria-hidden="true"></i>
           </div>
-        </section>
+        </router-link>
         <section class="bottom">
           <p>{{shopDetail.activities ? shopDetail.activities[0].description : ''}}</p>
           <span>{{shopDetail.activities ? shopDetail.activities.length : ''}}个活动<i class="fa fa-angle-right" aria-hidden="true"></i></span>
@@ -102,6 +105,9 @@
         </div>
       </transition>
     </section>
+    <transition name="slide" mode="out-in">
+      <router-view></router-view>
+    </transition>
   </div>
 </template>
 
@@ -145,6 +151,9 @@
         'getRatingTags',
         'getRatingList',
       ]),
+      goBack() {
+        this.$router.go(-1);
+      },
       getImagePath(path) {
         return getImgPath(path);
       },
@@ -263,6 +272,16 @@
 </script>
 
 <style rel="stylesheet/scss" lang="scss" scoped>
+  .go-back {
+    position: absolute;
+    z-index: 50;
+    top: -.05rem;
+    left: .02rem;
+    i {
+      font-size: .4rem;
+      color: #fff;
+    }
+  }
   .shop-header {
     position: relative;
     height: 1.05rem;
@@ -344,6 +363,7 @@
     top: 1.45rem;
     left: 0;
     bottom: 0;
+    width: 100%;
     .shop-merchandise {
       display: flex;
       height: 100%;
@@ -556,6 +576,13 @@
     display: none;
   }
   .fade-enter, .fade-leave-to {
+    opacity: 0;
+  }
+  .slide-enter-active, .slide-leave-active {
+    transition: all .4s;
+  }
+  .slide-enter, .slide-leave-active {
+    transform: translate(2rem, 0);
     opacity: 0;
   }
 </style>
