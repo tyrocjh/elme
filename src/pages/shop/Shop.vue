@@ -106,7 +106,7 @@
       </transition>
     </section>
     <transition name="slide" mode="out-in">
-      <router-view></router-view>
+      <router-view :shopDetail="shopDetail"></router-view>
     </transition>
   </div>
 </template>

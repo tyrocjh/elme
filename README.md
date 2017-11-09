@@ -34,12 +34,12 @@ For detailed explanation on how things work, checkout the [guide](http://vuejs-t
 3.page/shopList.vue里，当使用了better-scroll，同时使用vue-infinite-scroll，无限加载会无效（不知道为啥），所以自己写加载
 
 # todos
-本地如何用手机访问
 适配不同宽度（不同分辨率下，一行显示的文字数量一样，这不应该呀）
 加loading
 加墓碑效果
-要不要加入layout.vue
-header放在layout里面？还是每个页面都引用header,再通过slot传递不同的内容
-登录/注册功能为一体
+在手机端看效果（样式、卡不卡等问题）
 路由const home = r => require.ensure([], () => r(require('../page/home/home')), 'home')
 使用keep-alive缓存组件
+登录/注册功能为一体
+要不要加入layout.vue
+header放在layout里面？还是每个页面都引用header,再通过slot传递不同的内容
