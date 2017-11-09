@@ -15,7 +15,7 @@
             <i class="fa fa-angle-right" aria-hidden="true"></i>
           </div>
         </router-link>
-        <section class="bottom">
+        <section class="bottom" @click="handleShowActivity">
           <p>{{shopDetail.activities ? shopDetail.activities[0].description : ''}}</p>
           <span>{{shopDetail.activities ? shopDetail.activities.length : ''}}个活动<i class="fa fa-angle-right" aria-hidden="true"></i></span>
         </section>
@@ -105,6 +105,28 @@
         </div>
       </transition>
     </section>
+    <transition name="fade">
+      <section v-if="showActivity" class="activity-container">
+        <h2>{{shopDetail.name}}</h2>
+        <p class="rating"><el-rate v-model="ratingScores.service_score" disabled></el-rate></p>
+        <section class="activity-list">
+          <header><span>优惠信息</span></header>
+          <ul>
+            <li v-for="item in shopDetail.activities" :key="item.id">
+              <span class="icon" :style="{backgroundColor: '#' + item.icon_color, borderColor: '#' + item.icon_color}">{{item.icon_name}}</span>
+              <span>{{item.description}}（APP专享）</span>
+            </li>
+          </ul>
+        </section>
+        <section class="activity-info">
+          <header><span>商家公告</span></header>
+          <p>promotionInfo</p>
+        </section>
+        <div class="activity-close">
+          <i class="fa fa-close" aria-hidden="true" @click="handleShowActivity"></i>
+        </div>
+      </section>
+    </transition>
     <transition name="slide" mode="out-in">
       <router-view :shopDetail="shopDetail"></router-view>
     </transition>
@@ -128,6 +150,7 @@
         catType: 'food',
         foodListScrollY: -1,
         foodListHeight: [],
+        showActivity: false,
         disableLoadMore: false,
       };
     },
@@ -199,6 +222,9 @@
         const tmpIndex = index > 2 ? index - 2 : 0;
         this.merMenus.scrollToElement(this.$refs.menuGroup[tmpIndex], 200);
         this.merFoods.scrollToElement(this.$refs.foodGroup[index], 400);
+      },
+      handleShowActivity() {
+        this.showActivity = !this.showActivity;
       },
       loadMore() {
         this.disableLoadMore = true;
@@ -566,6 +592,64 @@
             }
           }
         }
+      }
+    }
+  }
+  .activity-container {
+    position: fixed;
+    z-index: 101;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    padding: .25rem;
+    background-color: #262626;
+    h2, p, span, header, i {
+      font-size: .12rem;
+      color: #fff;
+    }
+    h2 {
+      font-size: .16rem;
+      text-align: center;
+    }
+    .rating {
+      text-align: center;
+    }
+    .activity-list, .activity-info {
+      margin-top: .3rem;
+      header {
+        text-align: center;
+        span {
+          padding: .04rem .08rem;
+          border: .01rem solid #555;
+          border-radius: .1rem;
+        }
+      }
+    }
+    .activity-list {
+      ul {
+        margin-top: .1rem;
+        li {
+          span {
+            &.icon {
+              border-radius: .02rem;
+            }
+          }
+        }
+      }
+    }
+    .activity-info {
+      p {
+        margin-top: .1rem;
+      }
+    }
+    .activity-close {
+      .fa {
+        font-size: 40px;
+        position: absolute;
+        bottom: 50px;
+        left: 50%;
+        transform: translate(-50%);
       }
     }
   }
