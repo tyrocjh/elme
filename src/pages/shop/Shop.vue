@@ -45,9 +45,11 @@
                 <div  v-for="food in menu.foods" class="food-content" :key="food.id">
                   <img :src="baseUrl + '/img/' + food.image_path" />
                   <section class="food-detail">
-                    <h5>{{food.name}}</h5>
-                    <p>{{food.description}}</p>
-                    <span>月售{{food.month_sales}}份 好评率{{food.satisfy_rate}}%</span>
+                    <router-link :to="{path: 'shop/foodDetail', query:{image_path: food.image_path, description: food.description, month_sales: food.month_sales, name: food.name, rating: food.rating, rating_count: food.rating_count, satisfy_rate: food.satisfy_rate, price: food.specfoods[0].price, shopId}}" tag="div">
+                      <h5>{{food.name}}</h5>
+                      <p>{{food.description}}</p>
+                      <span>月售{{food.month_sales}}份 好评率{{food.satisfy_rate}}%</span>
+                    </router-link>
                     <div class="detail-bottom">
                       <span>￥{{food.specfoods[0].price}}</span>
                       <i class="fa fa-plus-circle" aria-hidden="true"></i>
@@ -258,6 +260,7 @@
           this.merFoods = new BScroll('.merchandise-r', {
             scrollY: true,
             probeType: 3,
+            click: true,
           });
           this.merFoods.on('scroll', (pos) => {
             this.foodListScrollY = -pos.y;
