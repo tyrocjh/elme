@@ -4,6 +4,7 @@ import Vuex from 'vuex';
 import city from './modules/city';
 import food from './modules/food';
 import shop from './modules/shop';
+import carts from './modules/carts';
 
 Vue.use(Vuex);
 
@@ -13,5 +14,6 @@ export default new Vuex.Store({
     city,
     food,
     shop,
+    carts,
   },
 });

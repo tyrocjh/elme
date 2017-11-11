@@ -52,7 +52,14 @@
                     </router-link>
                     <div class="detail-bottom">
                       <span>￥{{food.specfoods[0].price}}</span>
-                      <i class="fa fa-plus-circle" aria-hidden="true"></i>
+                      <section class="buy-remove">
+                        <template v-if="!food.specifications.length">
+                          <i class="fa fa-plus-circle" aria-hidden="true" @click="addToShoppingCarts(food)"></i>
+                        </template>
+                        <template v-else>
+                          <span>选规格</span>
+                        </template>
+                      </section>
                     </div>
                   </section>
                 </div>
@@ -175,6 +182,8 @@
         'getRatingScores',
         'getRatingTags',
         'getRatingList',
+        'addToCarts',
+        'getCarts',
       ]),
       goBack() {
         this.$router.go(-1);
@@ -189,6 +198,20 @@
           } else {
             this.foodListHeight.push(item.clientHeight + this.foodListHeight[idx - 1]);
           }
+        });
+      },
+      addToShoppingCarts(food) {
+        this.addToCarts({
+          shopId: this.shopId,
+          categoryId: food.category_id,
+          foodId: food.item_id,
+          specsId: food.specfoods[0].food_id,
+          name: food.specfoods[0].name,
+          price: food.specfoods[0].price,
+          specs: '',
+          packingFee: food.specfoods[0].packing_fee,
+          skuId: food.specfoods[0].sku_id,
+          stock: food.specfoods[0].stock,
         });
       },
       changeRatingTag(name, index) {
@@ -274,6 +297,7 @@
           tagName: this.ratingTagName,
           reset: true,
         });
+        this.getCarts();
       },
     },
     created() {
@@ -474,12 +498,14 @@
                 .detail-bottom {
                   display: flex;
                   justify-content: space-between;
-                  span {
+                  > span {
                     font-size: .14rem;
                     color: #f60;
                   }
-                  .fa {
-                    color: #3190e8;
+                  .buy-remove {
+                    .fa {
+                      color: #3190e8;
+                    }
                   }
                 }
               }

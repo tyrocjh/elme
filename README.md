@@ -38,6 +38,7 @@ For detailed explanation on how things work, checkout the [guide](http://vuejs-t
 加loading
 加墓碑效果
 在手机端看效果（样式、卡不卡等问题）
+加入购物车动画
 路由const home = r => require.ensure([], () => r(require('../page/home/home')), 'home')
 使用keep-alive缓存组件
 登录/注册功能为一体
