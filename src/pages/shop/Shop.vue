@@ -54,10 +54,18 @@
                       <span>￥{{food.specfoods[0].price}}</span>
                       <section class="buy-remove">
                         <template v-if="!food.specifications.length">
-                          <i class="fa fa-plus-circle" aria-hidden="true" @click="addToShoppingCarts(food)"></i>
+                          <i v-if="getFoodCount(shopId, food.category_id, food.item_id) > 0" class="fa fa-minus-circle" aria-hidden="true" @click="removeFromShoppingCart(food)"></i>
+                          <template v-if="getFoodCount(shopId, food.category_id, food.item_id) > 0">
+                            {{getFoodCount(shopId, food.category_id, food.item_id)}}
+                          </template>
+                          <i class="fa fa-plus-circle" aria-hidden="true" @click="addToShoppingCart(food)"></i>
                         </template>
                         <template v-else>
-                          <span>选规格</span>
+                          <i v-if="getFoodCount(shopId, food.category_id, food.item_id) > 0" class="fa fa-minus-circle disabled" aria-hidden="true" @click="showReduceTip"></i>
+                          <template v-if="getFoodCount(shopId, food.category_id, food.item_id) > 0">
+                            {{getFoodCount(shopId, food.category_id, food.item_id)}}
+                          </template>
+                          <span @click="showSpecsList(food)">选规格</span>
                         </template>
                       </section>
                     </div>
@@ -114,6 +122,7 @@
         </div>
       </transition>
     </section>
+
     <transition name="fade">
       <section v-if="showActivity" class="activity-container">
         <h2>{{shopDetail.name}}</h2>
@@ -136,14 +145,36 @@
         </div>
       </section>
     </transition>
+
     <transition name="slide" mode="out-in">
       <router-view :shopDetail="shopDetail"></router-view>
+    </transition>
+
+    <transition name="fade">
+      <p v-show="showTip" class="tip-box">多规格商品只能去购物车删除哦</p>
+    </transition>
+
+    <transition name="fade">
+      <el-dialog :visible.sync="showSpecs" :title="chosenFood && chosenFood.name">
+        <template v-if="chosenFood && chosenFood.specifications && chosenFood.specifications[0]">
+          <div>
+            <p>{{chosenFood.specifications[0].name}}</p>
+            <ul>
+              <li v-for="(item, index) in chosenFood.specifications[0].values" class="specs-li" :class="{active: chosenFoodIndex == index}" @click="chooseSpecs(index)">{{item}}</li>
+            </ul>
+          </div>
+          <div slot="footer" class="dialog-footer">
+            <span class="specs-price">¥{{chosenFood.specfoods[chosenFoodIndex].price}}</span>
+            <span class="specs-add" @click="addSpecs(chosenFood)">加入购物车</span>
+          </div>
+        </template>
+      </el-dialog>
     </transition>
   </div>
 </template>
 
 <script>
-  import { mapState, mapActions } from 'vuex';
+  import { mapState, mapGetters, mapActions } from 'vuex';
   import BScroll from 'better-scroll';
   import { baseUrl } from '@/config/env';
   import { getImgPath } from '@/utils/image';
@@ -159,8 +190,12 @@
         catType: 'food',
         foodListScrollY: -1,
         foodListHeight: [],
+        chosenFoodIndex: 0,
+        chosenFood: null,
         showActivity: false,
         disableLoadMore: false,
+        showTip: false,
+        showSpecs: false,
       };
     },
     computed: {
@@ -171,6 +206,9 @@
         ratingTags: ({ shop }) => shop.ratingTags,
         ratingList: ({ shop }) => shop.ratingList,
       }),
+      ...mapGetters([
+        'getFoodCount',
+      ]),
       promotionInfo() {
         return this.shopDetail.promotion_info || '欢迎光临，用餐高峰期请提前下单，谢谢。';
       },
@@ -183,6 +221,7 @@
         'getRatingTags',
         'getRatingList',
         'addToCarts',
+        'removeFromCarts',
         'getCarts',
       ]),
       goBack() {
@@ -200,18 +239,45 @@
           }
         });
       },
-      addToShoppingCarts(food) {
+      showReduceTip() {
+        this.showTip = true;
+        setTimeout(() => {
+          this.showTip = false;
+        }, 1500);
+      },
+      showSpecsList(food) {
+        this.chosenFoodIndex = 0;
+        this.chosenFood = food;
+        this.showSpecs = true;
+      },
+      chooseSpecs(index) {
+        this.chosenFoodIndex = index;
+      },
+      addSpecs(food) {
+        this.addToShoppingCart(food, true);
+        this.showSpecs = false;
+      },
+      addToShoppingCart(food, multiSpecs) {
+        const index = multiSpecs ? this.chosenFoodIndex : 0;
         this.addToCarts({
           shopId: this.shopId,
           categoryId: food.category_id,
           foodId: food.item_id,
+          specsId: food.specfoods[index].food_id,
+          name: food.specfoods[index].name,
+          price: food.specfoods[index].price,
+          specs: food.specifications && food.specifications[0] ? food.specifications[0].values[index] : '',
+          packingFee: food.specfoods[index].packing_fee,
+          skuId: food.specfoods[index].sku_id,
+          stock: food.specfoods[index].stock,
+        });
+      },
+      removeFromShoppingCart(food) {
+        this.removeFromCarts({
+          shopId: this.shopId,
+          categoryId: food.category_id,
+          foodId: food.item_id,
           specsId: food.specfoods[0].food_id,
-          name: food.specfoods[0].name,
-          price: food.specfoods[0].price,
-          specs: '',
-          packingFee: food.specfoods[0].packing_fee,
-          skuId: food.specfoods[0].sku_id,
-          stock: food.specfoods[0].stock,
         });
       },
       changeRatingTag(name, index) {
@@ -498,13 +564,27 @@
                 .detail-bottom {
                   display: flex;
                   justify-content: space-between;
+                  margin-top: .03rem;
                   > span {
                     font-size: .14rem;
                     color: #f60;
                   }
                   .buy-remove {
+                    font-size: .13rem;
+                    color: #666;
+                    span {
+                      padding: .02rem .04rem;
+                      margin-left: .01rem;
+                      color: #fff;
+                      background-color: #3190e8;
+                      border-radius: .05rem;
+                    }
                     .fa {
+                      font-size: .15rem;
                       color: #3190e8;
+                    }
+                    .disabled {
+                      color: #999;
                     }
                   }
                 }
@@ -674,13 +754,25 @@
     }
     .activity-close {
       .fa {
-        font-size: 40px;
+        font-size: .4rem;
         position: absolute;
-        bottom: 50px;
+        bottom: .5rem;
         left: 50%;
         transform: translate(-50%);
       }
     }
+  }
+  .tip-box {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translateY(-50%) translateX(-50%);
+    font-size: .13rem;
+    padding: .1rem;
+    border-radius: .1rem;
+    color: #fff;
+    background-color: rgba(0,0,0,.8);
+    white-space: nowrap;
   }
   .fade-enter-active, .fade-leave-active {
     transition: opacity .5s
@@ -706,5 +798,52 @@
     font-size: .12rem;
     margin-right: -.02rem;
     transform: scale(.8);
+  }
+
+  .el-dialog--small {
+    width: 80%;
+  }
+  .el-dialog__title {
+    font-size: .14rem;
+  }
+  .el-dialog__body {
+    p {
+      font-size: .12rem;
+      color: #666;
+    }
+    ul {
+      display: flex;
+      margin-top: .05rem;
+      .specs-li {
+        font-size: .12rem;
+        padding: .03rem .06rem;
+        margin-right: .06rem;
+        color: #bbb;
+        background-color: #fff;
+        border: .01rem solid #bbb;
+        border-radius: .04rem;
+
+        &.active {
+          color: #3199e8;
+          border-color: #3199e8;
+        }
+      }
+    }
+  }
+  .dialog-footer {
+    display: flex;
+    justify-content: space-between;
+    .specs-price {
+      font-size: .12rem;
+      font-weight: 700;
+      color: #ff6000;
+    }
+    .specs-add {
+      font-size: .12rem;
+      padding: .03rem .05rem;
+      border-radius: .04rem;
+      color: #fff;
+      background-color: #3199e8;
+    }
   }
 </style>
