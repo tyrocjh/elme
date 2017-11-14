@@ -13,6 +13,22 @@ const getters = {
     const shop = mGetters.getShop(shopid);
     return shop ? shop[catId] : '';
   },
+  getCatCount: (mState, mGetters) => (shopid, catId) => {
+    const category = mGetters.getCategory(shopid, catId);
+    let count = 0;
+    if (!category) {
+      return 0;
+    }
+    Object.keys(category).forEach((foodId) => {
+      if (!category[foodId]) {
+        return 0;
+      }
+      Object.keys(category[foodId]).forEach((specId) => {
+        count += category[foodId][specId].count;
+      });
+    });
+    return count;
+  },
   getFood: (mState, mGetters) => (shopid, catId, foodId) => {
     const category = mGetters.getCategory(shopid, catId);
     return category ? category[foodId] : '';
@@ -23,10 +39,9 @@ const getters = {
     if (!food) {
       return 0;
     }
-    const types = Object.keys(food);
-    for (let i = 0; i < types.length; i += 1) {
-      count += food[types[i]].count;
-    }
+    Object.keys(food).forEach((specId) => {
+      count += food[specId].count;
+    });
     return count;
   },
 };

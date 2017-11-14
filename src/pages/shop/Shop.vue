@@ -33,6 +33,7 @@
               <li v-for="(menu, index) in menus" ref="menuGroup" :class="{active: index == menuIndex}" :key="index" @click="changeMenu(index)">
                 <img v-if="menu.icon_url" :src="getImagePath(menu.icon_url)" />
                 <span>{{menu.name}}</span>
+                <p v-if="getCatCount(shopId, menu.id) > 0" class="cat-count">{{getCatCount(shopId, menu.id)}}</p>
               </li>
             </ul>
           </section>
@@ -43,6 +44,9 @@
                   <h4><strong>{{menu.name}}</strong>{{menu.description}}</h4>
                 </header>
                 <div  v-for="food in menu.foods" class="food-content" :key="food.id">
+                  <template v-if="food.attributes.length">
+                    <p v-if="food.attributes[0] && food.attributes[0].icon_name == '新'" class="new-merchant"><span>新品</span></p>
+                  </template>
                   <img :src="baseUrl + '/img/' + food.image_path" />
                   <section class="food-detail">
                     <router-link :to="{path: 'shop/foodDetail', query:{image_path: food.image_path, description: food.description, month_sales: food.month_sales, name: food.name, rating: food.rating, rating_count: food.rating_count, satisfy_rate: food.satisfy_rate, price: food.specfoods[0].price, shopId}}" tag="div">
@@ -207,6 +211,7 @@
         ratingList: ({ shop }) => shop.ratingList,
       }),
       ...mapGetters([
+        'getCatCount',
         'getFoodCount',
       ]),
       promotionInfo() {
@@ -490,6 +495,7 @@
         width: 24%;
         overflow: hidden;
         li {
+          position: relative;
           height: .54rem;
           line-height: .54rem;
           padding-left: .1rem;
@@ -509,6 +515,19 @@
           span {
             font-size: .12rem;
             color: #666;
+          }
+          .cat-count {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            height: 12px;
+            width: 12px;
+            text-align: center;
+            font-size: 12px;
+            color: #fff;
+            background-color: #ff461d;
+            border-radius: 50%;
+            line-height: 1;
           }
         }
       }
@@ -539,9 +558,27 @@
             }
             .food-content {
               display: flex;
+              position: relative;
+              overflow: hidden;
               padding: .1rem;
               border-bottom: .01rem solid #f8f8f8;
               background-color: #fff;
+              .new-merchant {
+                display: flex;
+                justify-content: center;
+                align-items: flex-end;
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: .42rem;
+                height: .42rem;
+                transform: rotate(-45deg) translate(0, -.3rem);
+                background-color: #5ec452;
+                span {
+                  font-size: .12rem;
+                  color: #fff;
+                }
+              }
               img {
                 width: .4rem;
                 height: .4rem;
