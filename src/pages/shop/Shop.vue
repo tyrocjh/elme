@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 <template>
   <div>
     <nav class="go-back" @click="goBack">
@@ -33,7 +34,7 @@
               <li v-for="(menu, index) in menus" ref="menuGroup" :class="{active: index == menuIndex}" :key="index" @click="changeMenu(index)">
                 <img v-if="menu.icon_url" :src="getImagePath(menu.icon_url)" />
                 <span>{{menu.name}}</span>
-                <p v-if="getCatCount(shopId, menu.id) > 0" class="cat-count">{{getCatCount(shopId, menu.id)}}</p>
+                <p v-if="getCountByCat(shopId, menu.id) > 0" class="cat-count">{{getCountByCat(shopId, menu.id)}}</p>
               </li>
             </ul>
           </section>
@@ -58,16 +59,16 @@
                       <span>￥{{food.specfoods[0].price}}</span>
                       <section class="buy-remove">
                         <template v-if="!food.specifications.length">
-                          <i v-if="getFoodCount(shopId, food.category_id, food.item_id) > 0" class="fa fa-minus-circle" aria-hidden="true" @click="removeFromShoppingCart(food)"></i>
-                          <template v-if="getFoodCount(shopId, food.category_id, food.item_id) > 0">
-                            {{getFoodCount(shopId, food.category_id, food.item_id)}}
+                          <i v-if="getCountByFood(shopId, food.category_id, food.item_id) > 0" class="fa fa-minus-circle" aria-hidden="true" @click="handleRemove(food)"></i>
+                          <template v-if="getCountByFood(shopId, food.category_id, food.item_id) > 0">
+                            {{getCountByFood(shopId, food.category_id, food.item_id)}}
                           </template>
-                          <i class="fa fa-plus-circle" aria-hidden="true" @click="addToShoppingCart(food)"></i>
+                          <i class="fa fa-plus-circle" aria-hidden="true" @click="handleAdd(food)"></i>
                         </template>
                         <template v-else>
-                          <i v-if="getFoodCount(shopId, food.category_id, food.item_id) > 0" class="fa fa-minus-circle disabled" aria-hidden="true" @click="showReduceTip"></i>
-                          <template v-if="getFoodCount(shopId, food.category_id, food.item_id) > 0">
-                            {{getFoodCount(shopId, food.category_id, food.item_id)}}
+                          <i v-if="getCountByFood(shopId, food.category_id, food.item_id) > 0" class="fa fa-minus-circle disabled" aria-hidden="true" @click="showReduceTip"></i>
+                          <template v-if="getCountByFood(shopId, food.category_id, food.item_id) > 0">
+                            {{getCountByFood(shopId, food.category_id, food.item_id)}}
                           </template>
                           <span @click="showSpecsList(food)">选规格</span>
                         </template>
@@ -126,6 +127,48 @@
         </div>
       </transition>
     </section>
+    <footer class="shopping-cart">
+      <section class="carts" @click="toggleCartList">
+        <span class="cart-icon" :class="{active: getCountByShop(this.shopId) > 0}">
+          <i v-if="getCountByShop(this.shopId) > 0" class="count">{{getCountByShop(shopId)}}</i>
+          <i class="fa fa-shopping-cart" aria-hidden="true"></i>
+        </span>
+        <div>
+          <span class="total">¥ {{getPriceByShop(shopId).toFixed(2)}}</span>
+          <span>配送费¥{{deliveryFee}}</span>
+        </div>
+      </section>
+      <section class="deliver" :class="{active: minimumOrderAmount <= 0}">
+        <span v-if="minimumOrderAmount > 0">还差¥{{minimumOrderAmount}}起送</span>
+        <router-link v-else :to="{path:'/confirmOrder', query:{geohash, shopId}}">去结算</router-link>
+      </section>
+    </footer>
+
+    <transition name="fade">
+      <section v-if="showCartList" @click="toggleCartList" class="shadow"></section>
+    </transition>
+
+    <transition name="toggle-cart">
+      <section v-if="showCartList" class="carts-list">
+        <header>
+          <h4>购物车</h4>
+          <span @click="handleClear(shopId)"><i class="fa fa-trash-o" aria-hidden="true"></i>清空</span>
+        </header>
+        <ul>
+          <li v-for="(item, index) in getSelectedFoodByShop(shopId)" :key="index">
+            <div class="message">
+              <p class="name">{{item.name}}</p><p>{{item.specs}}</p>
+            </div>
+            <div class="price">¥{{item.price}}</div>
+            <div class="count">
+              <i class="fa fa-minus-circle" aria-hidden="true" @click="removeFromShoppingCart(item.shopId, item.catId, item.foodId, item.id)"></i>
+              {{item.count}}
+              <i class="fa fa-plus-circle" aria-hidden="true" @click="addToShoppingCart(item.shopId, item.catId, item.foodId, item.id, item.name, item.price, item.specs, item.packingFee, item.skuId, item.stock)"></i>
+            </div>
+          </li>
+        </ul>
+      </section>
+    </transition>
 
     <transition name="fade">
       <section v-if="showActivity" class="activity-container">
@@ -178,6 +221,8 @@
 </template>
 
 <script>
+  /* eslint-disable max-len */
+
   import { mapState, mapGetters, mapActions } from 'vuex';
   import BScroll from 'better-scroll';
   import { baseUrl } from '@/config/env';
@@ -200,6 +245,7 @@
         disableLoadMore: false,
         showTip: false,
         showSpecs: false,
+        showCartList: false,
       };
     },
     computed: {
@@ -211,11 +257,21 @@
         ratingList: ({ shop }) => shop.ratingList,
       }),
       ...mapGetters([
-        'getCatCount',
-        'getFoodCount',
+        'getSelectedFoodByShop',
+        'getPriceByShop',
+        'getCountByShop',
+        'getCountByCat',
+        'getCountByFood',
       ]),
       promotionInfo() {
         return this.shopDetail.promotion_info || '欢迎光临，用餐高峰期请提前下单，谢谢。';
+      },
+      deliveryFee() {
+        return this.shopDetail ? this.shopDetail.float_delivery_fee : 0;
+      },
+      minimumOrderAmount() {
+        if (!this.shopDetail.float_minimum_order_amount) return -1;
+        return this.shopDetail.float_minimum_order_amount - this.getPriceByShop(this.shopId);
       },
     },
     methods: {
@@ -225,9 +281,10 @@
         'getRatingScores',
         'getRatingTags',
         'getRatingList',
+        'getCarts',
         'addToCarts',
         'removeFromCarts',
-        'getCarts',
+        'clearCarts',
       ]),
       goBack() {
         this.$router.go(-1);
@@ -244,6 +301,10 @@
           }
         });
       },
+      toggleCartList() {
+        if (this.getCountByShop(this.shopId) === 0 && !this.showCartList) return;
+        this.showCartList = !this.showCartList;
+      },
       showReduceTip() {
         this.showTip = true;
         setTimeout(() => {
@@ -259,31 +320,48 @@
         this.chosenFoodIndex = index;
       },
       addSpecs(food) {
-        this.addToShoppingCart(food, true);
+        this.handleAdd(food, true);
         this.showSpecs = false;
       },
-      addToShoppingCart(food, multiSpecs) {
+      handleAdd(food, multiSpecs) {
         const index = multiSpecs ? this.chosenFoodIndex : 0;
+        const foodId = food.specfoods[index].food_id;
+        const name = food.specfoods[index].name;
+        const price = food.specfoods[index].price;
+        const specs = food.specifications && food.specifications[0] ? food.specifications[0].values[index] : '';
+        const packingFee = food.specfoods[index].packing_fee;
+        const skuId = food.specfoods[index].sku_id;
+        const stock = food.specfoods[index].stock;
+        this.addToShoppingCart(this.shopId, food.category_id, food.item_id, foodId, name, price, specs, packingFee, skuId, stock);
+      },
+      addToShoppingCart(shopId, categoryId, foodId, specsId, name, price, specs, packingFee, skuId, stock) {
         this.addToCarts({
-          shopId: this.shopId,
-          categoryId: food.category_id,
-          foodId: food.item_id,
-          specsId: food.specfoods[index].food_id,
-          name: food.specfoods[index].name,
-          price: food.specfoods[index].price,
-          specs: food.specifications && food.specifications[0] ? food.specifications[0].values[index] : '',
-          packingFee: food.specfoods[index].packing_fee,
-          skuId: food.specfoods[index].sku_id,
-          stock: food.specfoods[index].stock,
+          shopId,
+          categoryId,
+          foodId,
+          specsId,
+          name,
+          price,
+          specs,
+          packingFee,
+          skuId,
+          stock,
         });
       },
-      removeFromShoppingCart(food) {
+      handleRemove(food) {
+        this.removeFromShoppingCart(this.shopId, food.category_id, food.item_id, food.specfoods[0].food_id);
+      },
+      removeFromShoppingCart(shopId, categoryId, foodId, specsId) {
         this.removeFromCarts({
-          shopId: this.shopId,
-          categoryId: food.category_id,
-          foodId: food.item_id,
-          specsId: food.specfoods[0].food_id,
+          shopId,
+          categoryId,
+          foodId,
+          specsId,
         });
+      },
+      handleClear(shopId) {
+        this.clearCarts(shopId);
+        this.toggleCartList();
       },
       changeRatingTag(name, index) {
         this.ratingTagIndex = index;
@@ -486,7 +564,7 @@
     position: absolute;
     top: 1.45rem;
     left: 0;
-    bottom: 0;
+    bottom: .4rem;
     width: 100%;
     .shop-merchandise {
       display: flex;
@@ -741,6 +819,160 @@
       }
     }
   }
+  .shopping-cart {
+    display: flex;
+    position: fixed;
+    z-index: 51;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: .4rem;
+    background-color: #3d3d3f;
+    div, span, a {
+      color: #fff;
+    }
+    .carts {
+      flex: 1;
+      display: flex;
+      position: relative;
+      .cart-icon {
+        position: absolute;
+        left: .1rem;
+        bottom: .1rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: .46rem;
+        height: .46rem;
+        background-color: #3d3d3f;
+        border: .04rem solid #444;
+        border-radius: 50%;
+        &.active {
+          background-color: #3190e8;
+        }
+        .count {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          position: absolute;
+          top: -.05rem;
+          right: -.03rem;
+          width: .15rem;
+          height: .15rem;
+          line-height: 1;
+          font-size: .12rem;
+          font-style: normal;
+          color: #fff;
+          background-color: #ff461d;
+          border-radius: 50%;
+        }
+        .fa {
+          font-size: .26rem;
+          color: #fff;
+        }
+      }
+      >div {
+        display: flex;
+        flex-direction: column;
+        position: absolute;
+        left: .7rem;
+        span {
+          font-size: .12rem;
+          color: #fff;
+          &.total {
+            font-size: .16rem;
+            font-weight: 700;
+          }
+        }
+      }
+    }
+    .deliver {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 1rem;
+      background-color: #535356;
+      &.active {
+        background-color: #4cd964;
+      }
+      a, span {
+        font-size: .14rem;
+        font-weight: 700;
+      }
+    }
+  }
+  .carts-list {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    z-index: 50;
+    width: 100%;
+    left: 0;
+    bottom: .4rem;
+    background-color: #fff;
+    header {
+      display: flex;
+      justify-content: space-between;
+      height: .3rem;
+      padding: .06rem .12rem;
+      background-color: #eceff1;
+      h4 {
+        font-size: .14rem;
+        color: #666;
+      }
+      span {
+        font-size: .12rem;
+        color: #666;
+        .fa {
+          padding-right: 5px;
+          color: #aaa;
+        }
+      }
+    }
+    ul {
+      overflow: auto;
+      max-height: 4rem;
+      padding: 0 .1rem;
+      li {
+        display: flex;
+        align-items: center;
+        height: .5rem;
+        div, p {
+          font-size: .12rem;
+          color: #666;
+        }
+        .message {
+          flex: 1;
+          .name {
+            font-size: 14px;
+            font-weight: 700;
+          }
+        }
+        .price {
+          width: 13%;
+          font-size: .14rem;
+          color: #f60;
+          font-weight: 700;
+        }
+        .count {
+          width: 15%;
+          font-size: .14rem;
+          .fa {
+            color: #3190e8;
+          }
+        }
+      }
+    }
+  }
+  .shadow {
+    position: fixed;
+    z-index: 50;
+    width: 100%;
+    top: 0;
+    left: 0;
+    bottom: .4rem;
+    background-color: rgba(0,0,0,.3);
+  }
   .activity-container {
     position: fixed;
     z-index: 101;
@@ -826,6 +1058,12 @@
   .slide-enter, .slide-leave-active {
     transform: translate(2rem, 0);
     opacity: 0;
+  }
+  .toggle-cart-enter-active, .toggle-cart-leave-active {
+    transition: all .3s ease-out;
+  }
+  .toggle-cart-enter, .toggle-cart-leave-active {
+    transform: translateY(100%);
   }
 </style>
 

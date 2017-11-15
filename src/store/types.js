@@ -23,5 +23,6 @@ export const SHOP_REQUEST_FAILED = 'SHOP_REQUEST_FAILED';
 export const CARTS_GET = 'CARTS_GET';
 export const CARTS_ADD = 'CARTS_ADD';
 export const CARTS_REMOVE = 'CARTS_REMOVE';
+export const CARTS_CLEAR = 'CARTS_CLEAR';
 export const CARTS_REQUEST = 'CARTS_REQUEST';
 export const CARTS_REQUEST_FAILED = 'CARTS_REQUEST_FAILED';
