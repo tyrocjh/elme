@@ -1,6 +1,8 @@
 import Vue from 'vue';
 import Router from 'vue-router';
 import Home from '@/pages/home/Home';
+import Login from '@/pages/login/Login';
+import Profile from '@/pages/profile/Profile';
 import City from '@/pages/city/City';
 import Msite from '@/pages/msite/Msite';
 import Food from '@/pages/food/Food';
@@ -17,6 +19,12 @@ export default new Router({
     {
       path: '/',
       redirect: '/home',
+    }, {
+      path: '/login',
+      component: Login,
+    }, {
+      path: '/profile',
+      component: Profile,
     }, {
       path: '/home',
       component: Home,

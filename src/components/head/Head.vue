@@ -9,20 +9,33 @@
       <span>{{headTitle}}</span>
     </section>
     <slot name="msite-title"></slot>
-    <router-link to="login" v-if="signinUp" class="login">
-      <span>登录|注册</span>
+    <router-link :to="userInfo ? '/profile' : '/login'" v-if="signinUp" class="login">
+      <i class="fa fa-user-o" aria-hidden="true" v-if="userInfo"></i>
+      <span v-else>登录|注册</span>
     </router-link>
     <slot name="changeCity"></slot>
   </header>
 </template>
 
 <script>
+  import { mapState, mapActions } from 'vuex';
+
   export default {
     props: ['signinUp', 'headTitle', 'goBack'],
-    data() {
-      return {
-        msg: 'header',
-      };
+    computed: {
+      ...mapState({
+        userInfo: ({ user }) => user.userInfo,
+      }),
+    },
+    methods: {
+      ...mapActions([
+        'getUser',
+      ]),
+    },
+    created() {
+      if (!this.userInfo) {
+        this.getUser();
+      }
     },
   };
 </script>
@@ -64,6 +77,9 @@
       right: .15rem;
       span {
         font-size: .12rem;
+        color: #fff;
+      }
+      .fa {
         color: #fff;
       }
     }

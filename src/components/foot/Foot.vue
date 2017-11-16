@@ -5,15 +5,15 @@
       <span>外卖</span>
     </section>
     <section @click="jumpLink({path: '/search'})">
-      <i class="fa fa-search-plus" aria-hidden="true"></i>
+      <i class="fa fa-search-plus" aria-hidden="true" :class="this.$route.path.indexOf('search') !== -1 ? 'active' : '' "></i>
       <span>搜索</span>
     </section>
     <section @click="jumpLink({path: '/order'})">
-      <i class="fa fa-list-ul" aria-hidden="true"></i>
+      <i class="fa fa-list-ul" aria-hidden="true" :class="this.$route.path.indexOf('order') !== -1 ? 'active' : '' "></i>
       <span>订单</span>
     </section>
     <section @click="jumpLink({path: '/profile'})">
-      <i class="fa fa-user-o" aria-hidden="true"></i>
+      <i class="fa fa-user-o" aria-hidden="true" :class="this.$route.path.indexOf('profile') !== -1 ? 'active' : '' "></i>
       <span>我的</span>
     </section>
   </footer>

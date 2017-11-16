@@ -1,3 +1,11 @@
+export const CAPTCHAS = 'CAPTCHAS';
+export const BASE_REQUEST = 'BASE_REQUEST';
+export const BASE_REQUEST_FAILED = 'BASE_REQUEST_FAILED';
+
+export const USER_INFO = 'USER_INFO';
+export const USER_REQUEST = 'USER_REQUEST';
+export const USER_REQUEST_FAILED = 'USER_REQUEST_FAILED';
+
 export const CURRENT_ADDRESS = 'CURRENT_ADDRESS';
 export const CURRENT_CITY = 'CURRENT_CITY';
 export const CITIES = 'CITIES';
