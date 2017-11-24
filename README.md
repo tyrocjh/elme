@@ -37,7 +37,8 @@ For detailed explanation on how things work, checkout the [guide](http://vuejs-t
 适配不同宽度（不同分辨率下，一行显示的文字数量一样，这不应该呀）
 加loading
 加墓碑效果
-在手机端看效果（样式、卡不卡等问题）
+在手机端看效果（样式、卡不卡等问题），多个手机安装多个浏览器看看
+使用cdn
 加入购物车动画
 路由const home = r => require.ensure([], () => r(require('../page/home/home')), 'home')
 使用keep-alive缓存组件

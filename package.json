@@ -5,6 +5,7 @@
   "author": "tyro",
   "private": true,
   "scripts": {
+    "start-server": "node server.js",
     "dev": "node build/dev-server.js",
     "start": "node build/dev-server.js",
     "build": "node build/build.js",
@@ -13,9 +14,12 @@
   "dependencies": {
     "axios": "^0.16.2",
     "better-scroll": "^1.4.0",
+    "body-parser": "^1.18.2",
     "element-ui": "^1.4.7",
+    "express": "^4.16.2",
     "font-awesome": "^4.7.0",
     "lodash": "^4.17.4",
+    "path": "^0.12.7",
     "swiper": "^4.0.0-beta.3",
     "vue": "^2.3.3",
     "vue-awesome-swiper": "^2.6.4",
