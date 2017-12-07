@@ -1,6 +1,6 @@
 /* eslint-disable max-len */
 import { SHOP_LIST, SHOP_DETAIL, SHOP_MENUS, SHOP_RATING_SCORES, SHOP_RATING_TAGS, SHOP_RATING_LIST, SHOP_OFFSET, SHOP_REQUEST, SHOP_REQUEST_FAILED } from '@/store/types';
-import { getShopList, getShopDetail, getMenus, getRatingScores, getRatingTags, getRatingList } from '@/api/shop';
+import { getShopList, getShopDetail, getMenus, getRatingScores, getRatingTags, getRatingList, searchShopList } from '@/api/shop';
 
 const state = {
   shopList: [],
@@ -97,6 +97,18 @@ const actions = {
           data: res.data,
           reset,
         });
+        resolve(res.data);
+      }).catch((err) => {
+        commit(SHOP_REQUEST_FAILED);
+        reject(err);
+      });
+    });
+  },
+  searchShopList({ commit }, params) {
+    const { geohash, keyword } = params;
+    return new Promise((resolve, reject) => {
+      commit(SHOP_REQUEST);
+      searchShopList(geohash, keyword).then((res) => {
         resolve(res.data);
       }).catch((err) => {
         commit(SHOP_REQUEST_FAILED);

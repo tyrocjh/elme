@@ -1,7 +1,7 @@
 <template>
   <div>
     <header-top signin-up="home">
-      <router-link :to="'/search/' + currentAddress.geohash" slot="search" class="search">
+      <router-link :to="{ path: '/search', query: { geohash: currentAddress.geohash} }" slot="search" class="search">
         <i class="fa fa-search" aria-hidden="true"></i>
       </router-link>
       <router-link to="/home" slot="msite-title" class="msite-title">

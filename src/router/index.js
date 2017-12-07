@@ -6,6 +6,7 @@ import Profile from '@/pages/profile/Profile';
 import City from '@/pages/city/City';
 import Msite from '@/pages/msite/Msite';
 import Food from '@/pages/food/Food';
+import Search from '@/pages/search/Search';
 import Shop from '@/pages/shop/Shop';
 import ShopDetail from '@/pages/shop/ShopDetail';
 import ShopSafe from '@/pages/shop/ShopSafe';
@@ -25,6 +26,9 @@ export default new Router({
     }, {
       path: '/profile',
       component: Profile,
+    }, {
+      path: '/search',
+      component: Search,
     }, {
       path: '/home',
       component: Home,

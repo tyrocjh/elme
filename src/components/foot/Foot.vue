@@ -4,7 +4,7 @@
       <i class="fa fa-cutlery" aria-hidden="true" :class="this.$route.path.indexOf('msite') !== -1 ? 'active' : '' "></i>
       <span>外卖</span>
     </section>
-    <section @click="jumpLink({path: '/search'})">
+    <section @click="jumpLink({path: '/search', query: {geohash}})">
       <i class="fa fa-search-plus" aria-hidden="true" :class="this.$route.path.indexOf('search') !== -1 ? 'active' : '' "></i>
       <span>搜索</span>
     </section>

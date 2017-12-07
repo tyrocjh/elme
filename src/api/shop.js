@@ -73,3 +73,16 @@ export function getRatingList(shopid, offset, tagName = '') {
     },
   });
 }
+
+export function searchShopList(geohash, keyword) {
+  return fetch({
+    url: '/v4/restaurants',
+    method: 'get',
+    params: {
+      'extras[]': 'restaurant_activity',
+      type: 'search',
+      geohash,
+      keyword,
+    },
+  });
+}
