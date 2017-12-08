@@ -419,8 +419,8 @@
         this.shopId = this.$route.query.id;
         this.getShopDetail({
           shopid: this.shopId,
-          latitude: this.geohash.split(',')[0],
-          longitude: this.geohash.split(',')[1],
+          latitude: this.geohash ? this.geohash.split(',')[0] : '',
+          longitude: this.geohash ? this.geohash.split(',')[1] : '',
         });
         this.getMenus(this.shopId).then(() => {
           this.calFoodListHeight();
